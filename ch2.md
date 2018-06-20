@@ -59,18 +59,18 @@ PostgreSQL允许多个客户端同时连接; 配置参数max_connections控制�
 > :pushpin: ​这里显示了PostgreSQL服务的实际进程。 在以下示例中，一个postgres服务器进程(pid为9687)，两个后端进程(pid为9697和9717)，并且表2.1中列出的几个后台进程正在运行。 也参见图2.1。
 
 >```shell
-postgres> pstree -p 9687
--+= 00001 root /sbin/launchd
- \-+- 09687 postgres /usr/local/pgsql/bin/postgres -D /usr/local/pgsql/data
-   |--= 09688 postgres postgres: logger process     
-   |--= 09690 postgres postgres: checkpointer process     
-   |--= 09691 postgres postgres: writer process     
-   |--= 09692 postgres postgres: wal writer process     
-   |--= 09693 postgres postgres: autovacuum launcher process     
-   |--= 09694 postgres postgres: archiver process     
-   |--= 09695 postgres postgres: stats collector process     
-   |--= 09697 postgres postgres: postgres sampledb 192.168.1.100(54924) idle  
-   \--= 09717 postgres postgres: postgres sampledb 192.168.1.100(54964) idle in transaction 
+>postgres> pstree -p 9687
+>-+= 00001 root /sbin/launchd
+> \-+- 09687 postgres /usr/local/pgsql/bin/postgres -D /usr/local/pgsql/data
+>   |--= 09688 postgres postgres: logger process     
+>   |--= 09690 postgres postgres: checkpointer process     
+>   |--= 09691 postgres postgres: writer process     
+>   |--= 09692 postgres postgres: wal writer process     
+>   |--= 09693 postgres postgres: autovacuum launcher process     
+>   |--= 09694 postgres postgres: archiver process     
+>   |--= 09695 postgres postgres: stats collector process     
+>   |--= 09697 postgres postgres: postgres sampledb 192.168.1.100(54924) idle  
+>   \--= 09717 postgres postgres: postgres sampledb 192.168.1.100(54964) idle in transaction 
 >```
 
 

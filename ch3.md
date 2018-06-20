@@ -108,15 +108,15 @@ SELECT查询的元素和解析树的相应元素的编号相同。 例如，(1)�
 > 假定已经定义了以下视图，并且相应的规则存储在pg_rules系统目录中。
 
 >```sql
-sampledb=# CREATE VIEW employees_list 
-sampledb-#      AS SELECT e.id, e.name, d.name AS department 
-sampledb-#            FROM employees AS e, departments AS d WHERE e.department_id = d.id;E
+>sampledb=# CREATE VIEW employees_list 
+>sampledb-#      AS SELECT e.id, e.name, d.name AS department 
+>sampledb-#            FROM employees AS e, departments AS d WHERE e.department_id = d.id;E
 >```
 
 > 当发出包含如下所示的视图查询时，解析器将创建解析树，如图3.4(a)所示。
 
 >```sql
-sampledb=# SELECT * FROM employees_list;
+>sampledb=# SELECT * FROM employees_list;
 >```
 
 > 在此阶段，重写器将范围表节点处理为子查询的解析树，子查询是存储在*pg_rules*中的对应视图。 
@@ -370,19 +370,19 @@ $H_{index}$是索引树的高度。
 >让我们考虑一下WHERE子句'continent ='Asia''的查询：
 
 >```sql
-testdb=# SELECT * FROM countries WHERE continent = 'Asia';
+>testdb=# SELECT * FROM countries WHERE continent = 'Asia';
 >```
 
 >在这种情况下，优化器使用‘continent’列的MCV估算索引扫描成本。 下面显示了此列的most_common_vals和most_common_freqs：
 
 >```sql
-testdb=# \x
-Expanded display is on.
-testdb=# SELECT most_common_vals, most_common_freqs FROM pg_stats 
-testdb-#                  WHERE tablename = 'countries' AND attname='continent';
--[ RECORD 1 ]-----+-------------------------------------------------------------
-most_common_vals  | {Africa,Europe,Asia,"North America",Oceania,"South America"}
-most_common_freqs | {0.274611,0.243523,0.227979,0.119171,0.0725389,0.0621762}
+>testdb=# \x
+>Expanded display is on.
+>testdb=# SELECT most_common_vals, most_common_freqs FROM pg_stats 
+>testdb-#                  WHERE tablename = 'countries' AND attname='continent';
+>-[ RECORD 1 ]-----+-------------------------------------------------------------
+>most_common_vals  | {Africa,Europe,Asia,"North America",Oceania,"South America"}
+>most_common_freqs | {0.274611,0.243523,0.227979,0.119171,0.0725389,0.0621762}
 >```
 
 > most_common_vals的'Asia'对应的most_common_freqs的值为0.227979。 因此，在此估计中使用0.227979作为selectivity。
@@ -462,63 +462,63 @@ indexCorrelation在下面详细描述，在这个例子中，
 > 表tbl_corr有五列：两列是文本类型，三列是整数类型。 三个整数列存储从1到12的数字。物理上，tbl_corr由三个page页组成，每个页有四个元组。 每个整数类型列都有一个名称为index_col_asc的索引，依此类推。
 
 >```sql
-testdb=# \d tbl_corr
-    Table "public.tbl_corr"
-  Column  |  Type   | Modifiers 
-----------+---------+-----------
- col      | text    | 
- col_asc  | integer | 
- col_desc | integer | 
- col_rand | integer | 
- data     | text    |
-Indexes:
-    "tbl_corr_asc_idx" btree (col_asc)
-    "tbl_corr_desc_idx" btree (col_desc)
-    "tbl_corr_rand_idx" btree (col_rand)
+>testdb=# \d tbl_corr
+>    Table "public.tbl_corr"
+>  Column  |  Type   | Modifiers 
+>----------+---------+-----------
+> col      | text    | 
+> col_asc  | integer | 
+> col_desc | integer | 
+> col_rand | integer | 
+> data     | text    |
+>Indexes:
+>    "tbl_corr_asc_idx" btree (col_asc)
+>    "tbl_corr_desc_idx" btree (col_desc)
+>    "tbl_corr_rand_idx" btree (col_rand)
 >```
 
 >```sql
-testdb=# SELECT col,col_asc,col_desc,col_rand 
-testdb-#                         FROM tbl_corr;
-   col    | col_asc | col_desc | col_rand 
-----------+---------+----------+----------
- Tuple_1  |       1 |       12 |        3
- Tuple_2  |       2 |       11 |        8
- Tuple_3  |       3 |       10 |        5
- Tuple_4  |       4 |        9 |        9
- Tuple_5  |       5 |        8 |        7
- Tuple_6  |       6 |        7 |        2
- Tuple_7  |       7 |        6 |       10
- Tuple_8  |       8 |        5 |       11
- Tuple_9  |       9 |        4 |        4
- Tuple_10 |      10 |        3 |        1
- Tuple_11 |      11 |        2 |       12
- Tuple_12 |      12 |        1 |        6
-(12 rows)
+>testdb=# SELECT col,col_asc,col_desc,col_rand 
+>testdb-#                         FROM tbl_corr;
+>   col    | col_asc | col_desc | col_rand 
+>----------+---------+----------+----------
+> Tuple_1  |       1 |       12 |        3
+> Tuple_2  |       2 |       11 |        8
+> Tuple_3  |       3 |       10 |        5
+> Tuple_4  |       4 |        9 |        9
+> Tuple_5  |       5 |        8 |        7
+> Tuple_6  |       6 |        7 |        2
+> Tuple_7  |       7 |        6 |       10
+> Tuple_8  |       8 |        5 |       11
+> Tuple_9  |       9 |        4 |        4
+> Tuple_10 |      10 |        3 |        1
+> Tuple_11 |      11 |        2 |       12
+> Tuple_12 |      12 |        1 |        6
+>(12 rows)
 >```
 
 > 这些列的索引相关性如下所示：
 
 >```sql
-testdb=# SELECT tablename,attname, correlation FROM pg_stats WHERE tablename = 'tbl_corr';
- tablename | attname  | correlation 
------------+----------+-------------
- tbl_corr  | col_asc  |           1
- tbl_corr  | col_desc |          -1
- tbl_corr  | col_rand |    0.125874
-(3 rows)
+>testdb=# SELECT tablename,attname, correlation FROM pg_stats WHERE >tablename = 'tbl_corr';
+> tablename | attname  | correlation 
+>-----------+----------+-------------
+> tbl_corr  | col_asc  |           1
+> tbl_corr  | col_desc |          -1
+> tbl_corr  | col_rand |    0.125874
+>(3 rows)
 >```
 
 > 当执行以下查询时，PostgreSQL只读取第一页，因为所有目标元组都存储在第一页中。 参考图3.8(a)。
 
 >```sql
-testdb=# SELECT * FROM tbl_corr WHERE col_asc BETWEEN 2 AND 4;
+>testdb=# SELECT * FROM tbl_corr WHERE col_asc BETWEEN 2 AND 4;
 >```
 
 > 另一方面，当执行以下查询时，PostgreSQL必须读取所有页。 参考图3.8(b).
 
 >```sql
-testdb=# SELECT * FROM tbl_corr WHERE col_rand BETWEEN 2 AND 4;
+>testdb=# SELECT * FROM tbl_corr WHERE col_rand BETWEEN 2 AND 4;
 >```
 
 > 这样，索引相关性是一种统计相关性，它反映了在估计索引扫描成本时表中索引排序和表中物理元组排序之间的扭曲所引起的随机访问的影响。
@@ -875,13 +875,13 @@ Sort  (cost=182.34..183.09 rows=300 width=8)
 > 临时文件暂时在base/pg_tmp子目录中创建，命名方法如下所示。
 
 >```shell
-{"pgsql_tmp"} + {PID of the postgres process which creates the file} . {sequencial number from 0}
+>{"pgsql_tmp"} + {PID of the postgres process which creates the file} . {sequencial number from 0}
 >```
 
 > 例如，临时文件‘pgsql_tmp8903.5’”是由PID为8903的Postgres进程创建的第6个临时文件。 
 
 >```shell
-$ ls -la /usr/local/pgsql/data/base/pgsql_tmp*
+>$ ls -la /usr/local/pgsql/data/base/pgsql_tmp*
 -rw-------  1 postgres  postgres  10240000 12  4 14:18 pgsql_tmp8903.5
 >```
 

@@ -144,18 +144,18 @@ txid可以相互比较。 例如，从txid 100的角度看，大于100的txid表
 > PostgreSQL提供了一个扩展pageinspect，用于显示数据库page页的内容。
 
 >```sql
-testdb=# CREATE EXTENSION pageinspect;
-CREATE EXTENSION
-testdb=# CREATE TABLE tbl (data text);
-CREATE TABLE
-testdb=# INSERT INTO tbl VALUES('A');
-INSERT 0 1
-testdb=# SELECT lp as tuple, t_xmin, t_xmax, t_field3 as t_cid, t_ctid 
-                FROM heap_page_items(get_raw_page('tbl', 0));
- tuple | t_xmin | t_xmax | t_cid | t_ctid 
--------+--------+--------+-------+--------
-     1 |     99 |      0 |     0 | (0,1)
-(1 row)
+>testdb=# CREATE EXTENSION pageinspect;
+>CREATE EXTENSION
+>testdb=# CREATE TABLE tbl (data text);
+>CREATE TABLE
+>testdb=# INSERT INTO tbl VALUES('A');
+>INSERT 0 1
+>testdb=# SELECT lp as tuple, t_xmin, t_xmax, t_field3 as t_cid, t_ctid 
+>                FROM heap_page_items(get_raw_page('tbl', 0));
+> tuple | t_xmin | t_xmax | t_cid | t_ctid 
+>-------+--------+--------+-------+--------
+>     1 |     99 |      0 |     0 | (0,1)
+>(1 row)
 >```
 
  
@@ -604,10 +604,10 @@ testdb=# SELECT * FROM tbl;
 > 为了处理这个问题，PostgreSQL使用*hint bits*，如下所示。
 
 >```c
-#define HEAP_XMIN_COMMITTED       0x0100   /* t_xmin committed */
-#define HEAP_XMIN_INVALID         0x0200   /* t_xmin invalid/aborted */
-#define HEAP_XMAX_COMMITTED       0x0400   /* t_xmax committed */
-#define HEAP_XMAX_INVALID         0x0800   /* t_xmax invalid/aborted */
+>#define HEAP_XMIN_COMMITTED       0x0100   /* t_xmin committed */
+>#define HEAP_XMIN_INVALID         0x0200   /* t_xmin invalid/aborted */
+>#define HEAP_XMAX_COMMITTED       0x0400   /* t_xmax committed */
+>#define HEAP_XMAX_INVALID         0x0800   /* t_xmax invalid/aborted */
 >```
 
 > 在读或写元组时，PostgreSQL尽可能将hint bits设置为元组的t_informask。 例如，假设PostgreSQL检查元组的t_xmin的状态并获得COMMITTED状态。 在这种情况下，PostgreSQL将hint bits HEAP_XMIN_COMMITTED设置为元组的t_infomask。 如果已经设置了hint bits，则不再需要TransactionIdDidCommit和TransactionIdDidAbort。 因此，PostgreSQL可以高效地检查每个元组的t_xmin和t_xmax的状态。

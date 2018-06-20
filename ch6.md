@@ -390,20 +390,20 @@ Full VACUUM的伪代码如下所示：
 > :pushpin: *伪代码：Full VACUUM*
 
 >```sql
-(1)  FOR each table
-(2)       Acquire AccessExclusiveLock lock for the table
-(3)       Create a new table file
-(4)       FOR each live tuple in the old table
-(5)            Copy the live tuple to the new table file
-(6)            Freeze the tuple IF necessary
-            END FOR
-(7)        Remove the old table file
-(8)        Rebuild all indexes
-(9)        Update FSM and VM
-(10)      Update statistics
-            Release AccessExclusiveLock lock
-       END FOR
-(11)  Remove unnecessary clog files and pages if possible
+>(1)  FOR each table
+>(2)       Acquire AccessExclusiveLock lock for the table
+>(3)       Create a new table file
+>(4)       FOR each live tuple in the old table
+>(5)            Copy the live tuple to the new table file
+>(6)            Freeze the tuple IF necessary
+>            END FOR
+>(7)        Remove the old table file
+>(8)        Rebuild all indexes
+>(9)        Update FSM and VM
+>(10)      Update statistics
+>            Release AccessExclusiveLock lock
+>       END FOR
+>(11)  Remove unnecessary clog files and pages if possible
 >```
 
 使用VACUUM FULL命令时应考虑两点。
@@ -459,30 +459,30 @@ Full VACUUM的伪代码如下所示：
 > 以下查询将检查指定表的每个页的空闲空间比例。
 
 >```sql
-testdb=# SELECT *, round(100 * avail/8192 ,2) as "freespace ratio"
-                FROM pg_freespace('accounts');
- blkno | avail | freespace ratio 
--------+-------+-----------------
-     0 |  7904 |           96.00
-     1 |  7520 |           91.00
-     2 |  7136 |           87.00
-     3 |  7136 |           87.00
-     4 |  7136 |           87.00
-     5 |  7136 |           87.00
-....
+>testdb=# SELECT *, round(100 * avail/8192 ,2) as "freespace ratio"
+>                FROM pg_freespace('accounts');
+> blkno | avail | freespace ratio 
+>-------+-------+-----------------
+>     0 |  7904 |           96.00
+>     1 |  7520 |           91.00
+>     2 |  7136 |           87.00
+>     3 |  7136 |           87.00
+>     4 |  7136 |           87.00
+>     5 |  7136 |           87.00
+>....
 >```
 
 > 在执行VACUUM FULL之后，您会发现表文件已被压缩。
 
 >```sql
-testdb=# VACUUM FULL accounts;
-VACUUM
-testdb=# SELECT count(*) as "number of blocks",
-       pg_size_pretty(cast(avg(avail) as bigint)) as "Av. freespace size",
-       round(100 * avg(avail)/8192 ,2) as "Av. freespace ratio"
-       FROM pg_freespace('accounts');
- number of pages | Av. freespace size | Av. freespace ratio 
------------------+--------------------+---------------------
-             164 | 0 bytes            |                0.00
-(1 row)
+>testdb=# VACUUM FULL accounts;
+>VACUUM
+>testdb=# SELECT count(*) as "number of blocks",
+>       pg_size_pretty(cast(avg(avail) as bigint)) as "Av. freespace size",
+>       round(100 * avg(avail)/8192 ,2) as "Av. freespace ratio"
+>       FROM pg_freespace('accounts');
+> number of pages | Av. freespace size | Av. freespace ratio 
+>-----------------+--------------------+---------------------
+>             164 | 0 bytes            |                0.00
+>(1 row)
 >```

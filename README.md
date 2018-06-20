@@ -28,7 +28,7 @@
 - [第五章.](ch5.md) 并发控制
 - [第六章.](ch6.md) VACUUM
 - [第七章.](ch7.md) HOT(Heap-Only-Tuple)技术和仅索引扫描(Index-Only Scans)
-- [第八章.](ch8.md) 缓冲管理器
+- [第八章.](ch8.md) 缓冲区管理器
 - [第九章.](ch9.md) 预写式日志 (WAL)
 - [第十章.](ch10.md) 基础备份和时间点恢复 (PITR)
 - [第十一章.](ch11.md) 流复制
