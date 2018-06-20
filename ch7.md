@@ -97,23 +97,23 @@ testdb=# UPDATE tbl SET data = 'B' WHERE id = 1000;
 
  
 
- *HOT 不可用情况*
+> :pushpin: *HOT 不可用情况*
 
-为了清楚地理解HOT如何执行，描述一下HOT不可用的情况。
+> 为了清楚地理解HOT如何执行，描述一下HOT不可用的情况。
 
-当更新的元组存储在另一个不存储旧元组的页中时，指向元组的索引元组也被插入到索引页中。 参考图7.6(a)。
+> 当更新的元组存储在另一个不存储旧元组的页中时，指向元组的索引元组也被插入到索引页中。 参考图7.6(a)。
 
-当索引元组的key值被更新时，新的索引元组被插入到索引页中。 参照图7.6(b)。
+> 当索引元组的key值被更新时，新的索引元组被插入到索引页中。 参照图7.6(b)。
 
-**图. 7.6. HOT不可用的情况**
+> **图. 7.6. HOT不可用的情况**
 
-![Fig. 7.6. The Cases in which HOT is not available](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch7/fig-7-06.png?raw=true)
+> ![Fig. 7.6. The Cases in which HOT is not available](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch7/fig-7-06.png?raw=true)
 
  
 
-*与HOT相关的统计信息*
+> :pushpin: *与HOT相关的统计信息*
 
- [pg_stat_all_tables](https://www.postgresql.org/docs/current/static/monitoring-stats.html#PG-STAT-ALL-TABLES-VIEW) 视图为每个表提供统计值。 另请参阅此[扩展](https://github.com/s-hironobu/pg_stats)。
+> [pg_stat_all_tables](https://www.postgresql.org/docs/current/static/monitoring-stats.html#PG-STAT-ALL-TABLES-VIEW) 视图为每个表提供统计值。 另请参阅此[扩展](https://github.com/s-hironobu/pg_stats)。
 
  
 

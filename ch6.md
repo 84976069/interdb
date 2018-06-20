@@ -40,54 +40,54 @@ vacuum处理对指定的表或数据库中的所有表执行以下操作
 
  
 
- *伪代码: Concurrent VACUUM*
+> :pushpin: *伪代码: Concurrent VACUUM*
 
-```sql
-(1)  FOR each table
-(2)       Acquire ShareUpdateExclusiveLock lock for the target table
+>```sql
+>(1)  FOR each table
+>(2)       Acquire ShareUpdateExclusiveLock lock for the target table
+>
+>          /* The first block */
+>(3)       Scan all pages to get all dead tuples, and freeze old tuples if necessary 
+>(4)       Remove the index tuples that point to the respective dead tuples if exists
+>
+>          /* The second block */
+>(5)       FOR each page of the table
+>(6)            Remove the dead tuples, and Reallocate the live tuples in the page
+>(7)            Update FSM and VM
+>           END FOR
+>
+>          /* The third block */
+>(8)       Truncate the last page if possible
+>(9)       Update both the statistics and system catalogs of the target table
+>           Release ShareUpdateExclusiveLock lock
+>       END FOR
+>
+>        /* Post-processing */
+>(10)  Update statistics and system catalogs
+>(11)  Remove both unnecessary files and pages of the clog if possible
+>```
 
-          /* The first block */
-(3)       Scan all pages to get all dead tuples, and freeze old tuples if necessary 
-(4)       Remove the index tuples that point to the respective dead tuples if exists
+> (1)从指定的表中获取每个表。
 
-          /* The second block */
-(5)       FOR each page of the table
-(6)            Remove the dead tuples, and Reallocate the live tuples in the page
-(7)            Update FSM and VM
-           END FOR
+> (2)获取表的ShareUpdateExclusiveLock锁。 该锁允许从其他事务中读取。
 
-          /* The third block */
-(8)       Truncate the last page if possible
-(9)       Update both the statistics and system catalogs of the target table
-           Release ShareUpdateExclusiveLock lock
-       END FOR
+> (3)扫描所有页以获取所有dead tuple，并在必要时冻结dead tuple。
 
-        /* Post-processing */
-(10)  Update statistics and system catalogs
-(11)  Remove both unnecessary files and pages of the clog if possible
-```
+> (4)删除指向相应dead tuple的索引元组(如果存在的话)。
 
-(1)从指定的表中获取每个表。
+> (5)为表的每个页执行以下处理，步骤(6)和(7)。
 
-(2)获取表的ShareUpdateExclusiveLock锁。 该锁允许从其他事务中读取。
+> (6)删除dead tuple并重新分配页中的live tuple。
 
-(3)扫描所有页以获取所有dead tuple，并在必要时冻结dead tuple。
+> (7)更新目标表的相应FSM和VM。
 
-(4)删除指向相应dead tuple的索引元组(如果存在的话)。
+> (8)如果最后一页没有任何元组，则截断最后一页。
 
-(5)为表的每个页执行以下处理，步骤(6)和(7)。
+> (9)更新与vacuum处理的表相关的统计数据和系统目录。
 
-(6)删除dead tuple并重新分配页中的live tuple。
+> (10)更新与vacuum处理相关的统计数据和系统目录。
 
-(7)更新目标表的相应FSM和VM。
-
-(8)如果最后一页没有任何元组，则截断最后一页。
-
-(9)更新与vacuum处理的表相关的统计数据和系统目录。
-
-(10)更新与vacuum处理相关的统计数据和系统目录。
-
-(11)如果可能，删除不必要的文件和clog。
+> (11)如果可能，删除不必要的文件和clog。
 
 
 
@@ -127,11 +127,13 @@ vacuum处理对指定的表或数据库中的所有表执行以下操作
 
 当vacuum处理完成后，PostgreSQL会更新与vacuum处理有关的多个统计数据和系统目录，并且如果可能的话，它会删除clog不必要的部分(见第6.4节)。 
 
-vacuum处理使用8.5节描述的 *ring buffer*; 因此，处理的页面不会缓存在共享缓冲区中。
+
+
+> :pushpin: ​vacuum处理使用8.5节描述的 *ring buffer*; 因此，处理的页面不会缓存在共享缓冲区中。
 
  
 
-## 6.2. Visibility Map
+## 6.2. 可见性映射表 Visibility Map
 
 vacuum处理成本高昂; 因此，在8.4版本中引入了VM以降低成本。
 
@@ -163,7 +165,11 @@ VM在版本9.6中进行了增强，以提高冻结处理的效率。 新的VM显
 
 Concurrent VACUUM在内部通常被称为“lazy vacuum”。 但是，本文定义的 lazy 模式是冻结处理如何执行的模式。
 
-冻结处理通常以 lazy 模式运行; 然而，当特定条件得到满足时，eager模式运行。
+
+
+> :exclamation: 冻结处理通常以 lazy 模式运行; 然而，当特定条件得到满足时，eager模式运行。
+
+
 
 在 lazy 模式下，冻结处理仅使用目标表的相应VM扫描包含dead tuple的页面。
 
@@ -243,46 +249,46 @@ Tuple_10已被冻结。 Tuple_11没有。
 
  
 
-*查看pg_class.relfrozenxid 和 pg_database.datfrozenxid*
+> :pushpin: *查看pg_class.relfrozenxid 和 pg_database.datfrozenxid*
 
-在下文中，第一个查询显示'testdb'数据库中所有可见关系的relfrozenxids，第二个查询显示'testdb'数据库的pg_database.datfrozenxld。
+> 在下文中，第一个查询显示'testdb'数据库中所有可见关系的relfrozenxids，第二个查询显示'testdb'数据库的pg_database.datfrozenxld。
 
-```sql
-testdb=# VACUUM table_1;
-VACUUM
+>```sql
+>testdb=# VACUUM table_1;
+>VACUUM
+>
+>testdb=# SELECT n.nspname as "Schema", c.relname as "Name", c.relfrozenxid
+>             FROM pg_catalog.pg_class c
+>             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+>             WHERE c.relkind IN ('r','')
+>                   AND n.nspname <> 'information_schema' AND n.nspname !~ '^pg_toast'
+>                   AND pg_catalog.pg_table_is_visible(c.oid)
+>                   ORDER BY c.relfrozenxid::text::bigint DESC;
+>   Schema   |            Name         | relfrozenxid 
+>------------+-------------------------+--------------
+> public     | table_1                 |    100002000
+> public     | table_2                 |         1846
+> pg_catalog | pg_database             |         1827
+> pg_catalog | pg_user_mapping         |         1821
+> pg_catalog | pg_largeobject          |         1821
+>
+>...
+>
+> pg_catalog | pg_transform            |         1821
+>(57 rows)
+>
+>testdb=# SELECT datname, datfrozenxid FROM pg_database WHERE datname = 'testdb';
+> datname | datfrozenxid 
+>---------+--------------
+> testdb  |         1821
+>(1 row)
+>```
 
-testdb=# SELECT n.nspname as "Schema", c.relname as "Name", c.relfrozenxid
-             FROM pg_catalog.pg_class c
-             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-             WHERE c.relkind IN ('r','')
-                   AND n.nspname <> 'information_schema' AND n.nspname !~ '^pg_toast'
-                   AND pg_catalog.pg_table_is_visible(c.oid)
-                   ORDER BY c.relfrozenxid::text::bigint DESC;
-   Schema   |            Name         | relfrozenxid 
-------------+-------------------------+--------------
- public     | table_1                 |    100002000
- public     | table_2                 |         1846
- pg_catalog | pg_database             |         1827
- pg_catalog | pg_user_mapping         |         1821
- pg_catalog | pg_largeobject          |         1821
 
-...
 
- pg_catalog | pg_transform            |         1821
-(57 rows)
+> :pushpin: *FREEZE option*
 
-testdb=# SELECT datname, datfrozenxid FROM pg_database WHERE datname = 'testdb';
- datname | datfrozenxid 
----------+--------------
- testdb  |         1821
-(1 row)
-```
-
- 
-
- *FREEZE option*
-
-具有FREEZE选项的VACUUM命令强制冻结指定表中的所有txid。 这在eager模式下执行; 但是，freezeLimit设置为OldestXmin(不是'OldestXmin - vacuum_freeze_min_age')。 例如，当VACUUM FULL命令由txid 5000执行且没有其他正在运行的事务时，OldesXmin被设置为5000，而小于5000的txids被冻结。
+> 具有FREEZE选项的VACUUM命令强制冻结指定表中的所有txid。 这在eager模式下执行; 但是，freezeLimit设置为OldestXmin(不是'OldestXmin - vacuum_freeze_min_age')。 例如，当VACUUM FULL命令由txid 5000执行且没有其他正在运行的事务时，OldesXmin被设置为5000，而小于5000的txids被冻结。
 
  
 
@@ -310,27 +316,27 @@ testdb=# SELECT datname, datfrozenxid FROM pg_database WHERE datname = 'testdb';
 
  
 
- *pg_database.datfrozenxid and the clog file*
+> :pushpin: *pg_database.datfrozenxid and the clog file*
 
-下面显示了pg_database.datfrozenxid和clog文件的实际输出：
+> 下面显示了pg_database.datfrozenxid和clog文件的实际输出：
 
-```sql
-$ psql testdb -c "SELECT datname, datfrozenxid FROM pg_database"
-  datname  | datfrozenxid 
------------+--------------
- template1 |      7308883
- template0 |      7556347
- postgres  |      7339732
- testdb    |      7506298
-(4 rows)
-
-$ ls -la -h data/pg_clog/	# In version 10 or later, "ls -la -h data/pg_xact/"
-total 316K
-drwx------  2 postgres postgres   28 Dec 29 17:15 .
-drwx------ 20 postgres postgres 4.0K Dec 29 17:13 ..
--rw-------  1 postgres postgres 256K Dec 29 17:15 0006
--rw-------  1 postgres postgres  56K Dec 29 17:15 0007
-```
+>```sql
+>$ psql testdb -c "SELECT datname, datfrozenxid FROM pg_database"
+> datname  | datfrozenxid 
+>-----------+--------------
+>template1 |      7308883
+>template0 |      7556347
+>postgres  |      7339732
+>testdb    |      7506298
+>(4 rows)
+>
+>$ ls -la -h data/pg_clog/	# In version 10 or later, "ls -la -h data/pg_xact/"
+>total 316K
+>drwx------  2 postgres postgres   28 Dec 29 17:15 .
+>drwx------ 20 postgres postgres 4.0K Dec 29 17:13 ..
+>-rw-------  1 postgres postgres 256K Dec 29 17:15 0006
+>-rw-------  1 postgres postgres  56K Dec 29 17:15 0007
+>```
 
  
 
@@ -381,9 +387,9 @@ Full VACUUM的伪代码如下所示：
 
  
 
-*伪代码：Full VACUUM*
+> :pushpin: *伪代码：Full VACUUM*
 
-```sql
+>```sql
 (1)  FOR each table
 (2)       Acquire AccessExclusiveLock lock for the table
 (3)       Create a new table file
@@ -398,7 +404,7 @@ Full VACUUM的伪代码如下所示：
             Release AccessExclusiveLock lock
        END FOR
 (11)  Remove unnecessary clog files and pages if possible
-```
+>```
 
 使用VACUUM FULL命令时应考虑两点。
 
@@ -408,50 +414,51 @@ Full VACUUM的伪代码如下所示：
 
  
 
-*什么时候做VACUUM FULL？*
+> :pushpin: *什么时候做VACUUM FULL？*
 
-不幸的是，当执行'VACUUM FULL'时没有最佳时机。 但是，扩展[pg_freespacemap](https://www.postgresql.org/docs/current/static/pgfreespacemap.html)可能会给你很好的建议。
+> 不幸的是，当执行'VACUUM FULL'时没有最佳时机。 但是，扩展[pg_freespacemap](https://www.postgresql.org/docs/current/static/pgfreespacemap.html)可能会给你很好的建议。
 
-以下查询显示了表的平均空闲空间比例。
+> 以下查询显示了表的平均空闲空间比例。
 
-```sql
-testdb=# CREATE EXTENSION pg_freespacemap;
-CREATE EXTENSION
+>```sql
+>testdb=# CREATE EXTENSION pg_freespacemap;
+>CREATE EXTENSION
+>
+>testdb=# SELECT count(*) as "number of pages",
+>       pg_size_pretty(cast(avg(avail) as bigint)) as "Av. freespace size",
+>       round(100 * avg(avail)/8192 ,2) as "Av. freespace ratio"
+>       FROM pg_freespace('accounts');
+> number of pages | Av. freespace size | Av. freespace ratio 
+>-----------------+--------------------+---------------------
+>            1640 | 99 bytes           |                1.21
+>(1 row)
+>```
 
-testdb=# SELECT count(*) as "number of pages",
-       pg_size_pretty(cast(avg(avail) as bigint)) as "Av. freespace size",
-       round(100 * avg(avail)/8192 ,2) as "Av. freespace ratio"
-       FROM pg_freespace('accounts');
- number of pages | Av. freespace size | Av. freespace ratio 
------------------+--------------------+---------------------
-            1640 | 99 bytes           |                1.21
-(1 row)
-```
+> 如上所述，您可以发现空闲空间很少。
 
-如上所述，您可以发现空闲空间很少。
+> 如果删除大部分元组并执行VACUUM命令，则可以发现页几乎是空的。
 
-如果删除大部分元组并执行VACUUM命令，则可以发现页几乎是空的。
+>```sql
+>testdb=# DELETE FROM accounts WHERE aid %10 != 0 OR aid < 100;
+>DELETE 90009
+>
+>
+>testdb=# VACUUM accounts;
+>VACUUM
+>
+>testdb=# SELECT count(*) as "number of pages",
+>       pg_size_pretty(cast(avg(avail) as bigint)) as "Av. freespace size",
+>       round(100 * avg(avail)/8192 ,2) as "Av. freespace ratio"
+>       FROM pg_freespace('accounts');
+> number of pages | Av. freespace size | Av. freespace ratio 
+>-----------------+--------------------+---------------------
+>            1640 | 7124 bytes         |               86.97
+>(1 row)
+>```
 
-```sql
-testdb=# DELETE FROM accounts WHERE aid %10 != 0 OR aid < 100;
-DELETE 90009
+> 以下查询将检查指定表的每个页的空闲空间比例。
 
-testdb=# VACUUM accounts;
-VACUUM
-
-testdb=# SELECT count(*) as "number of pages",
-       pg_size_pretty(cast(avg(avail) as bigint)) as "Av. freespace size",
-       round(100 * avg(avail)/8192 ,2) as "Av. freespace ratio"
-       FROM pg_freespace('accounts');
- number of pages | Av. freespace size | Av. freespace ratio 
------------------+--------------------+---------------------
-            1640 | 7124 bytes         |               86.97
-(1 row)
-```
-
-以下查询将检查指定表的每个页的空闲空间比例。
-
-```sql
+>```sql
 testdb=# SELECT *, round(100 * avail/8192 ,2) as "freespace ratio"
                 FROM pg_freespace('accounts');
  blkno | avail | freespace ratio 
@@ -463,11 +470,11 @@ testdb=# SELECT *, round(100 * avail/8192 ,2) as "freespace ratio"
      4 |  7136 |           87.00
      5 |  7136 |           87.00
 ....
-```
+>```
 
-在执行VACUUM FULL之后，您会发现表文件已被压缩。
+> 在执行VACUUM FULL之后，您会发现表文件已被压缩。
 
-```sql
+>```sql
 testdb=# VACUUM FULL accounts;
 VACUUM
 testdb=# SELECT count(*) as "number of blocks",
@@ -478,4 +485,4 @@ testdb=# SELECT count(*) as "number of blocks",
 -----------------+--------------------+---------------------
              164 | 0 bytes            |                0.00
 (1 row)
-```
+>```

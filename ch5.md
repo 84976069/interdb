@@ -36,22 +36,21 @@ SI不支持ANSI SQL-92标准中定义的三种异常，即 *脏读 Dirty Reads*,
 
   
 
-*PostgreSQL中的事务隔离界别  Transaction Isolation Level in PostgreSQL*
+> :pushpin: *PostgreSQL中的事务隔离界别  Transaction Isolation Level in PostgreSQL*
 
-下表描述了PostgreSQL实现的事务隔离级别：
+> 下表描述了PostgreSQL实现的事务隔离级别：
 
-| 级别               | 脏读   | 不可重复读 | 幻读                                         | 序列化异常 |
-| ------------------ | ------ | ---------- | -------------------------------------------- | ---------- |
-| READ COMMITTED     | 不可能 | 可能       | 可能                                         | 可能       |
-| REPEATABLE READ *1 | 不可能 | 不可能     | PG中不可能; 参见5.7.2节。 (在ANSI SQL中可能) | 可能       |
-| SERIALIZABLE       | 不可能 | 不可能     | 不可能                                       | 不可能     |
+>| 级别               | 脏读   | 不可重复读 | 幻读                                         | 序列化异常 |
+>| ------------------ | ------ | ---------- | -------------------------------------------- | ---------- |
+>| READ COMMITTED     | 不可能 | 可能       | 可能                                         | 可能       |
+>| REPEATABLE READ *1 | 不可能 | 不可能     | PG中不可能; 参见5.7.2节。 (在ANSI SQL中可能) | 可能       |
+>| SERIALIZABLE       | 不可能 | 不可能     | 不可能                                       | 不可能     |
 
-
-*1：在9.0及更早版本中，此级别被用作'SERIALIZABLE'，因为它不允许ANSI SQL-92标准中定义的三种异常。 但是，在9.1版本实现SSI，此级别已更改为“REPEATABLE READ”，并引入了真正的SERIALIZABLE级别。
+> *1：在9.0及更早版本中，此级别被用作'SERIALIZABLE'，因为它不允许ANSI SQL-92标准中定义的三种异常。 但是，在9.1版本实现SSI，此级别已更改为“REPEATABLE READ”，并引入了真正的SERIALIZABLE级别。
 
  
 
-PostgreSQL对于DML(Data Manipulation Language，例如SELECT，UPDATE，INSERT，DELETE)使用SSI，对DDL(Data Definition Language，例如CREATE TABLE等)使用2PL。
+> :exclamation: PostgreSQL对于DML(Data Manipulation Language，例如SELECT，UPDATE，INSERT，DELETE)使用SSI，对DDL(Data Definition Language，例如CREATE TABLE等)使用2PL。
 
 ## 5.1. 事务ID
 
@@ -83,7 +82,7 @@ txid可以相互比较。 例如，从txid 100的角度看，大于100的txid表
 
 注意，在5.10.1节中描述所谓的 *txid wraparound 问题*。 
 
-注意，没有为BEGIN命令分配一个txid。在PostgreSQL中，当执行BEGIN命令后执行第一个命令时，事务管理器将分配一个tixd，然后开始事务处理。
+> :pushpin: 注意，没有为BEGIN命令分配一个txid。在PostgreSQL中，当执行BEGIN命令后执行第一个命令时，事务管理器将分配一个tixd，然后开始事务处理。
 
  
 
@@ -97,7 +96,9 @@ txid可以相互比较。 例如，从txid 100的角度看，大于100的txid表
 
 ![Fig. 5.2. Tuple structure.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch5/fig-5-02.png?raw=true)
 
-HeapTupleHeaderData 结构在 [src/include/access/htup_details.h](https://github.com/postgres/postgres/blob/ee943004466418595363d567f18c053bae407792/src/include/access/htup_details.h) 中定义。
+> :pushpin: HeapTupleHeaderData 结构在 [src/include/access/htup_details.h](https://github.com/postgres/postgres/blob/ee943004466418595363d567f18c053bae407792/src/include/access/htup_details.h) 中定义。
+
+
 
 虽然 [HeapTupleHeaderData](javascript:void(0)) 结构包含七个元素，但后续章节中只涉及其中四个元素。
 
@@ -138,11 +139,11 @@ HeapTupleHeaderData 结构在 [src/include/access/htup_details.h](https://github
 
    
 
-*pageinspect*
+> :pushpin: *pageinspect*
 
-PostgreSQL提供了一个扩展pageinspect，用于显示数据库page页的内容。
+> PostgreSQL提供了一个扩展pageinspect，用于显示数据库page页的内容。
 
-```sql
+>```sql
 testdb=# CREATE EXTENSION pageinspect;
 CREATE EXTENSION
 testdb=# CREATE TABLE tbl (data text);
@@ -155,7 +156,7 @@ testdb=# SELECT lp as tuple, t_xmin, t_xmax, t_field3 as t_cid, t_ctid
 -------+--------+--------+-------+--------
      1 |     99 |      0 |     0 | (0,1)
 (1 row)
-```
+>```
 
  
 
@@ -234,30 +235,28 @@ dead tuple 最终应该从page页中删除。 清理 dead tuple 被称为**VACUU
 
 
 
-pg_freespacemap
+> :pushpin: pg_freespacemap
 
-扩展[pg_freespacemap](https://www.postgresql.org/docs/current/static/pgfreespacemap.html)提供指定表/索引的空闲空间。 以下查询显示指定表中每个页的空闲空间比率。
+> 扩展[pg_freespacemap](https://www.postgresql.org/docs/current/static/pgfreespacemap.html)提供指定表/索引的空闲空间。 以下查询显示指定表中每个页的空闲空间比率。
 
-```sql
-testdb=# CREATE EXTENSION pg_freespacemap;
-CREATE EXTENSION
-
-testdb=# SELECT *, round(100 * avail/8192 ,2) as "freespace ratio"
-                FROM pg_freespace('accounts');
- blkno | avail | freespace ratio 
--------+-------+-----------------
-     0 |  7904 |           96.00
-     1 |  7520 |           91.00
-     2 |  7136 |           87.00
-     3 |  7136 |           87.00
-     4 |  7136 |           87.00
-     5 |  7136 |           87.00
-....
-```
+>```sql
+>testdb=# CREATE EXTENSION pg_freespacemap;
+>CREATE EXTENSION
+>
+>testdb=# SELECT *, round(100 * avail/8192 ,2) as "freespace ratio"
+>                FROM pg_freespace('accounts');
+> blkno | avail | freespace ratio 
+>-------+-------+-----------------
+>     0 |  7904 |           96.00
+>     1 |  7520 |           91.00
+>     2 |  7136 |           87.00
+>     3 |  7136 |           87.00
+>     4 |  7136 |           87.00
+>     5 |  7136 |           87.00
+>     ...
+>```
 
  
-
-------
 
 ## 5.4. 事务提交日志 (clog)
 
@@ -306,50 +305,52 @@ PostgreSQL在内部将事务快照的文本表示格式定义为"100：100："�
 
  
 
-*内置函数txid_current_snapshot及其文本表示格式* 
+> :pushpin: *内置函数txid_current_snapshot及其文本表示格式* 
 
-函数 [txid_current_snapshot](http://www.postgresql.org/docs/current/static/functions-info.html#FUNCTIONS-TXID-SNAPSHOT) 查看当前事务的快照。
+> 函数 [txid_current_snapshot](http://www.postgresql.org/docs/current/static/functions-info.html#FUNCTIONS-TXID-SNAPSHOT) 查看当前事务的快照。
 
-```sql
-testdb=# SELECT txid_current_snapshot();
- txid_current_snapshot 
------------------------
- 100:104:100,102
-(1 row)
-```
+>```sql
+>testdb=# SELECT txid_current_snapshot();
+>txid_current_snapshot 
+>-----------------------
+> 100:104:100,102
+>(1 row)
+>```
 
-txid_current_snapshot的文本表示形式为“xmin：xmax：xip_list“，这些内容描述如下。
+> txid_current_snapshot的文本表示形式为“xmin：xmax：xip_list“，这些内容描述如下。
 
-- xmin
+>- xmin
 
-  最早的还在活动的txid。所有之前的事务要么提交且可见，要么回滚而无效。 
+> ​	 最早的还在活动的txid。所有之前的事务要么提交且可见，要么回滚而无效。 
 
-- xmax
+>- xmax
 
-  尚未分配的txid。所有大于或等于此值的txid在快照时间之前尚未启动，因此不可见。 
+>  	尚未分配的txid。所有大于或等于此值的txid在快照时间之前尚未启动，因此不可见。 
 
-- xip_list
+>- xip_list
 
-  在快照时间活动的txid。 该list只包含xmin和xmax之间的活动txid。 
+>  	在快照时间活动的txid。 该list只包含xmin和xmax之间的活动txid。 
 
-例如，在快照100:104:100,102‘ 中，xmin是'100'，xmax '104'和xip_list '100,102'。
+> 例如，在快照100:104:100,102‘ 中，xmin是'100'，xmax '104'和xip_list '100,102'。
 
-以下是两个具体示例：
+> 以下是两个具体示例：
 
-**图. 5.8. 事务快照示例**
+> **图. 5.8. 事务快照示例**
 
-![Fig. 5.8. Examples of transaction snapshot representation.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch5/fig-5-08.png?raw=true)
+> ![Fig. 5.8. Examples of transaction snapshot representation.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch5/fig-5-08.png?raw=true)
 
-第一个例子是'100'。 该快照意味着以下内容(图5.8(a))：
+> 第一个例子是'100'。 该快照意味着以下内容(图5.8(a))：
 
-- 等于或小于99的txids不活动，因为xmin是100。
-- 等于或大于100的txids是活动的，因为xmax是100。
+>- 等于或小于99的txids不活动，因为xmin是100。
+>- 等于或大于100的txids是活动的，因为xmax是100。
 
-第二个例子是'100:104:100,102'。 这个快照意味着以下内容(图5.8(b))：
+> 第二个例子是'100:104:100,102'。 这个快照意味着以下内容(图5.8(b))：
 
-- 等于或小于99的txids不活动。
-- 等于或大于104的txids处于活动状态。
-- 因为它们存在于xip list中，所以txids 100和102是活动的，而txids 101和103不活动。
+>- 等于或小于99的txids不活动。
+>- 等于或大于104的txids处于活动状态。
+>- 因为它们存在于xip list中，所以txids 100和102是活动的，而txids 101和103不活动。
+
+
 
 事务快照由事务管理器提供。 在READ COMMITTED隔离级别中，只要执行SQL命令，事务就会获得快照; 除此之外(REPEATABLE READ或SERIALIZABLE)，事务只会在执行第一个SQL命令时获取快照。 获取的事务快照用于元组的可见性检查，这在5.7节中有描述。
 
@@ -596,20 +597,20 @@ testdb=# SELECT * FROM tbl;
 
  
 
-*Hint Bits*
+> :pushpin: *Hint Bits*
 
-为了获得一个事务的状态，PostgreSQL在内部提供了三个函数，即TransactionIdIsInProgress，TransactionIdDidCommit和TransactionIdDidAbort。 实现这些功能是为了减少频繁访问clog，例如缓存。 但是，如果在检查每个元组时执行它们，瓶颈将会发生。
+> 为了获得一个事务的状态，PostgreSQL在内部提供了三个函数，即TransactionIdIsInProgress，TransactionIdDidCommit和TransactionIdDidAbort。 实现这些功能是为了减少频繁访问clog，例如缓存。 但是，如果在检查每个元组时执行它们，瓶颈将会发生。
 
-为了处理这个问题，PostgreSQL使用*hint bits*，如下所示。
+> 为了处理这个问题，PostgreSQL使用*hint bits*，如下所示。
 
-```c
+>```c
 #define HEAP_XMIN_COMMITTED       0x0100   /* t_xmin committed */
 #define HEAP_XMIN_INVALID         0x0200   /* t_xmin invalid/aborted */
 #define HEAP_XMAX_COMMITTED       0x0400   /* t_xmax committed */
 #define HEAP_XMAX_INVALID         0x0800   /* t_xmax invalid/aborted */
-```
+>```
 
-在读或写元组时，PostgreSQL尽可能将hint bits设置为元组的t_informask。 例如，假设PostgreSQL检查元组的t_xmin的状态并获得COMMITTED状态。 在这种情况下，PostgreSQL将hint bits HEAP_XMIN_COMMITTED设置为元组的t_infomask。 如果已经设置了hint bits，则不再需要TransactionIdDidCommit和TransactionIdDidAbort。 因此，PostgreSQL可以高效地检查每个元组的t_xmin和t_xmax的状态。
+> 在读或写元组时，PostgreSQL尽可能将hint bits设置为元组的t_informask。 例如，假设PostgreSQL检查元组的t_xmin的状态并获得COMMITTED状态。 在这种情况下，PostgreSQL将hint bits HEAP_XMIN_COMMITTED设置为元组的t_infomask。 如果已经设置了hint bits，则不再需要TransactionIdDidCommit和TransactionIdDidAbort。 因此，PostgreSQL可以高效地检查每个元组的t_xmin和t_xmax的状态。
 
  
 
@@ -636,62 +637,62 @@ testdb=# SELECT * FROM tbl;
 
  
 
-*伪代码: ExecUpdate*
+> :pushpin: *伪代码: ExecUpdate*
 
-```c
-[1]	FOR each row that will be updated by this UPDATE command
-[2]		WHILE true
+>```c
+>[1]	FOR each row that will be updated by this UPDATE command
+>[2]		WHILE true
+>
+>			/* The First Block */
+>[3]			IF the target row is being updated THEN
+>[4]				WAIT for the termination of the transaction that updated the target row
+>
+>[5]				IF (the status of the terminated transaction is COMMITTED)
+>					AND (the isolation level of this transaction is REPEATABLE READ or SERIALIZABLE) THEN
+>[6]					ABORT this transaction  /* First-Updater-Win */
+>				ELSE 
+>[7]					GOTO step (2)
+>				END IF
+>
+>			/* The Second Block */
+>[8]			ELSE IF the target row has been updated by another concurrent transaction THEN
+>[9]				IF (the isolation level of this transaction is READ COMMITTED THEN
+>[10]				UPDATE the target row
+>				ELSE
+>[11]				ABORT this transaction  /* First-Updater-Win */
+>			END IF
+>
+>			/* The Third Block */
+>			ELSE  /* The target row is not yet modified or has been updated by a terminated transaction. */
+>[12]			UPDATE the target row
+>			END IF
+>		END WHILE 
+>	END FOR 
+>```
 
-			/* The First Block */
-[3]			IF the target row is being updated THEN
-[4]				WAIT for the termination of the transaction that updated the target row
+> (1)  获取将由此UPDATE命令更新的每一行。
 
-[5]				IF (the status of the terminated transaction is COMMITTED)
-					AND (the isolation level of this transaction is REPEATABLE READ or SERIALIZABLE) THEN
-[6]					ABORT this transaction  /* First-Updater-Win */
-				ELSE 
-[7]					GOTO step (2)
-				END IF
+> (2) 重复以下过程，直到目标行被更新(或该事务被中止)。
 
-			/* The Second Block */
-[8]			ELSE IF the target row has been updated by another concurrent transaction THEN
-[9]				IF (the isolation level of this transaction is READ COMMITTED THEN
-[10]				UPDATE the target row
-				ELSE
-[11]				ABORT this transaction  /* First-Updater-Win */
-			END IF
+> (3) 如果目标行正在更新，请继续步骤(3); 否则，继续步骤(8)。
 
-			/* The Third Block */
-			ELSE  /* The target row is not yet modified or has been updated by a terminated transaction. */
-[12]			UPDATE the target row
-			END IF
-		END WHILE 
-	END FOR 
-```
+> (4) 等待更新目标行的事务终止，因为PostgreSQL在SI中使用 *first-updater-win* 方案。
 
-(1)  获取将由此UPDATE命令更新的每一行。
+> (5) 如果更新目标行的事务的状态为COMMITTED，并且此事务的隔离级别为REPEATABLE READ(或SERIALIZABLE)，则继续步骤(6); 否则，继续步骤(7)。
 
-(2) 重复以下过程，直到目标行被更新(或该事务被中止)。
+> (6) 中止此事务以防止丢失更新。
 
-(3) 如果目标行正在更新，请继续步骤(3); 否则，继续步骤(8)。
+> (7) 继续步骤(2)并尝试更新下一轮中的目标行。
 
-(4) 等待更新目标行的事务终止，因为PostgreSQL在SI中使用 *first-updater-win* 方案。
+> (8) 如果目标行已被另一个并发事务更新，则继续步骤(9); 否则，继续步骤(12)。
 
-(5) 如果更新目标行的事务的状态为COMMITTED，并且此事务的隔离级别为REPEATABLE READ(或SERIALIZABLE)，则继续步骤(6); 否则，继续步骤(7)。
+> (9) 如果此事务的隔离级别为READ COMMITTED，则继续执行步骤(10); 否则，进入步骤(11)。
 
-(6) 中止此事务以防止丢失更新。
+> (10) 更新目标行，然后继续步骤(1)。
 
-(7) 继续步骤(2)并尝试更新下一轮中的目标行。
+> (11) 中止此事务以防止Lost Update。
 
-(8) 如果目标行已被另一个并发事务更新，则继续步骤(9); 否则，继续步骤(12)。
-
-(9) 如果此事务的隔离级别为READ COMMITTED，则继续执行步骤(10); 否则，进入步骤(11)。
-
-(10) 更新目标行，然后继续步骤(1)。
-
-(11) 中止此事务以防止Lost Update。
-
-(12) 更新目标行，并继续执行步骤(1)，因为目标行尚未修改或已被终止的事务更新，即存在 ww-confict。
+> (12) 更新目标行，并继续执行步骤(1)，因为目标行尚未修改或已被终止的事务更新，即存在 ww-confict。
 
  
 
@@ -717,9 +718,9 @@ testdb=# SELECT * FROM tbl;
 
  
 
- *first-updater-win / first-commiter-win*
+> :pushpin: *first-updater-win / first-commiter-win*
 
-基于SI的PostgreSQL的并发控制使用*first-updater-win*机制。 相反，如下一节所述，PostgreSQL的SSI使用*first-committer-win*机制。
+> 基于SI的PostgreSQL的并发控制使用*first-updater-win*机制。 相反，如下一节所述，PostgreSQL的SSI使用*first-committer-win*机制。
 
  
 
@@ -794,7 +795,7 @@ PostgreSQL采用以下策略来实现SSI：
 
 
 
-为简单起见，本文档中省略了一些重要的数据结构，例如SERIALIZABLEXACT。 因此，函数的解释，即CheckTargetForConflictOut，CheckTargetForConflictIn和PreCommit_CheckForSerializationFailure也是非常简单的描述。 例如，我们指出哪些功能检测到冲突; 但是，如何检测冲突并没有详细解释。 如果你想知道细节，请参考源代码：predicate.c。
+> :heavy_exclamation_mark: 为简单起见，本文档中省略了一些重要的数据结构，例如SERIALIZABLEXACT。 因此，函数的解释，即CheckTargetForConflictOut，CheckTargetForConflictIn和PreCommit_CheckForSerializationFailure也是非常简单的描述。 例如，我们指出哪些功能检测到冲突; 但是，如何检测冲突并没有详细解释。 如果你想知道细节，请参考源代码：predicate.c。
 
  
 
@@ -906,7 +907,7 @@ CheckTargetForConflictsIn创建rw-confict C1，这是Tx_B和Tx_A之间Pkey_1和T
 
  
 
-这个 [Wiki](https://wiki.postgresql.org/wiki/SSI) 解释了几个更复杂的异常。 
+> :pushpin: ​这个 [Wiki](https://wiki.postgresql.org/wiki/SSI) 解释了几个更复杂的异常。 
 
  
 

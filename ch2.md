@@ -54,9 +54,11 @@ PostgreSQL允许多个客户端同时连接; 配置参数max_connections控制�
 | logging collector (logger) | 此进程将错误消息写入日志文件。                               |                                                              |
 | archiver                   | 此进程将执行归档日志记录。                                   | [9.10 节](http://www.interdb.jp/pg/pgsql09.html#_9.10.)      |
 
-这里显示了PostgreSQL服务的实际进程。 在以下示例中，一个postgres服务器进程(pid为9687)，两个后端进程(pid为9697和9717)，并且表2.1中列出的几个后台进程正在运行。 也参见图2.1。
 
-```shell
+
+> :pushpin: ​这里显示了PostgreSQL服务的实际进程。 在以下示例中，一个postgres服务器进程(pid为9687)，两个后端进程(pid为9697和9717)，并且表2.1中列出的几个后台进程正在运行。 也参见图2.1。
+
+>```shell
 postgres> pstree -p 9687
 -+= 00001 root /sbin/launchd
  \-+- 09687 postgres /usr/local/pgsql/bin/postgres -D /usr/local/pgsql/data
@@ -68,8 +70,10 @@ postgres> pstree -p 9687
    |--= 09694 postgres postgres: archiver process     
    |--= 09695 postgres postgres: stats collector process     
    |--= 09697 postgres postgres: postgres sampledb 192.168.1.100(54924) idle  
-   \--= 09717 postgres postgres: postgres sampledb 192.168.1.100(54964) idle in transaction  
-```
+   \--= 09717 postgres postgres: postgres sampledb 192.168.1.100(54964) idle in transaction 
+>```
+
+
 
 ## 2.2. 内存体系结构 
 

@@ -48,7 +48,9 @@ PostgreSQL支持两个有趣的技术和实用的特性，即[外部数据包(Fo
 
 在本节中，提供了这些子系统的概述。 由于优化器和执行器非常复杂，下面将对这些功能进行详细说明。
 
-PostgreSQL的查询处理在[官方文档](http://www.postgresql.org/docs/current/static/overview.html)中有详细描述。
+
+
+> :pushpin: PostgreSQL的查询处理在[官方文档](http://www.postgresql.org/docs/current/static/overview.html)中有详细描述。
 
 ### 3.1.1. 解析器(Parser)
 
@@ -99,23 +101,27 @@ SELECT查询的元素和解析树的相应元素的编号相同。 例如，(1)�
 
 重写是实现规则系统的系统，根据存储在pg_rules系统目录中的规则转换查询树。 规则系统本身就是一个有趣的体系，但是为了防止本章变得太长，规则系统和重写器的描述被忽略了。
 
-PostgreSQL中的[视图](https://www.postgresql.org/docs/current/static/rules-views.html)使用规则系统实现。 当视图由[CREATE VIEW](http://www.postgresql.org/docs/current/static/sql-createview.html) 命令定义时，自动生成相应的规则并将其存储在系统目录中。 
 
-假定已经定义了以下视图，并且相应的规则存储在pg_rules系统目录中。
 
-```sql
+> :pushpin: PostgreSQL中的[视图](https://www.postgresql.org/docs/current/static/rules-views.html)使用规则系统实现。 当视图由[CREATE VIEW](http://www.postgresql.org/docs/current/static/sql-createview.html) 命令定义时，自动生成相应的规则并将其存储在系统目录中。 
+
+> 假定已经定义了以下视图，并且相应的规则存储在pg_rules系统目录中。
+
+>```sql
 sampledb=# CREATE VIEW employees_list 
 sampledb-#      AS SELECT e.id, e.name, d.name AS department 
-sampledb-#            FROM employees AS e, departments AS d WHERE e.department_id = d.id;
-```
+sampledb-#            FROM employees AS e, departments AS d WHERE e.department_id = d.id;E
+>```
 
-当发出包含如下所示的视图查询时，解析器将创建解析树，如图3.4(a)所示。
+> 当发出包含如下所示的视图查询时，解析器将创建解析树，如图3.4(a)所示。
 
-```sql
+>```sql
 sampledb=# SELECT * FROM employees_list;
-```
+>```
 
-在此阶段，重写器将范围表节点处理为子查询的解析树，子查询是存储在*pg_rules*中的对应视图。 
+> 在此阶段，重写器将范围表节点处理为子查询的解析树，子查询是存储在*pg_rules*中的对应视图。 
+
+
 
 **图. 3.4. 重写示例**
 
@@ -129,9 +135,13 @@ sampledb=# SELECT * FROM employees_list;
 
 PostgreSQL中的优化器是基于成本的优化；它不支持基于规则的优化和提示。此计划器是RDBMS中最复杂的子系统；因此，本章后面的部分将详细描述优化器。 
 
- *pg_hint_plan*
 
-PostgreSQL不支持在SQL中规划提示，它将永远不被支持。如果您想在查询中使用提示，那么值得考虑引用*pg_hint_plan*扩展。请详细参考[官方网站](http://pghintplan.osdn.jp/pg_hint_plan.html)。 
+
+> :pushpin: *pg_hint_plan*
+
+> PostgreSQL不支持在SQL中规划提示，它将永远不被支持。如果您想在查询中使用提示，那么值得考虑引用*pg_hint_plan*扩展。请详细参考[官方网站](http://pghintplan.osdn.jp/pg_hint_plan.html)。 
+
+
 
 与其他RDBMS一样，PostgreSQL中的 [EXPLAIN](http://www.postgresql.org/docs/current/static/sql-explain.html) 命令显示计划树。 示例如下所示。
 
@@ -262,7 +272,9 @@ Seq Scan on tbl  (cost=0.00..170.00 rows=8000 width=8)
 
 在第4行，我们可以发现启动和总成本分别是170.00和170.00， 据估计，将通过扫描所有行来选择8000行(tuple)。  在第5行中，显示了顺序扫描的过滤器‘Filter：(ID<8000)’。 更准确地说，它被称为*table level filter predicate*。 请注意，这种类型的过滤器是在读取表中的所有元组时使用的，并且它不会缩小page页的扫描范围。 
 
-从运行成本估算中可以看出，PostgreSQL假设所有页面都将从存储中读取; 也就是说，PostgreSQL不会考虑扫描页是否在共享缓冲区中。
+
+
+> :pushpin: 从运行成本估算中可以看出，PostgreSQL假设所有页面都将从存储中读取; 也就是说，PostgreSQL不会考虑扫描页是否在共享缓冲区中。
 
 ### 3.2.2. 索引扫描
 
@@ -305,7 +317,11 @@ $H_{index}$是索引树的高度。
 
 ​	‘run cost’ = (‘index cpu cost’ + ‘table cpu cost’) + (‘index IO cost’ + ‘table IO cost’).
 
-如果可以使用 [Index-Only Scans](https://www.postgresql.org/docs/10/static/indexes-index-only-scans.html)(第7章中描述)，则不估计'‘table cpu cost’和'table IO cost’。
+
+
+> :pushpin: 如果可以使用 [Index-Only Scans](https://www.postgresql.org/docs/10/static/indexes-index-only-scans.html)(第7章中描述)，则不估计'‘table cpu cost’和'table IO cost’。
+
+
 
 前三项成本(i.e. index cpu cost, table cpu cost and index IO cost) 如下所示：
 
@@ -317,50 +333,49 @@ $H_{index}$是索引树的高度。
 
 其中[cpu_index_tuple_cost](https://www.postgresql.org/docs/current/static/runtime-config-query.html#GUC-CPU-INDEX-TUPLE-COST)和[random_page_cost](https://www.postgresql.org/docs/current/static/runtime-config-query.html#GUC-RANDOM-PAGE-COST)在postgresql.conf文件中设置(默认值分别为0.005和4.0); 大致来说，qual_op_cost是索引的评估成本，这里没有给出太多解释：qual_op_cost=0.0025。Selectivity是指定WHERE子句的索引搜索范围的比例; 它是从0到1的浮点数，下面详细介绍。 例如，(Selectivity×$N_{tuple}$)表示要读取的表元组的数量，(Selectivity×$N_{index,page}$)表示要读取的索引页的数量等等。
 
-*Selectivity*
+> :pushpin: *Selectivity*
 
-查询谓词的selectivity是使用histogram_bounds或MCV(Most Common Value)估计的，它们都存储在统计信息[pg_stats](https://www.postgresql.org/docs/current/static/view-pg-stats.html)中。 这里，使用具体实例简要描述selectivity的计算。 更多细节见[官方文档](https://www.postgresql.org/docs/10/static/row-estimation-examples.html)。 
+> 查询谓词的selectivity是使用histogram_bounds或MCV(Most Common Value)估计的，它们都存储在统计信息[pg_stats](https://www.postgresql.org/docs/current/static/view-pg-stats.html)中。 这里，使用具体实例简要描述selectivity的计算。 更多细节见[官方文档](https://www.postgresql.org/docs/10/static/row-estimation-examples.html)。 
 
-表中每列的MCV作为一对most_common_vals和most_common_freqs列存储在[pg_stats](https://www.postgresql.org/docs/10/static/view-pg-stats.html)视图中。
+> 表中每列的MCV作为一对most_common_vals和most_common_freqs列存储在[pg_stats](https://www.postgresql.org/docs/10/static/view-pg-stats.html)视图中。
 
-- most_common_vals是该列的MCV列表。
-- most_common_freqs是MCV频率的列表。
+>- most_common_vals是该列的MCV列表。
+>- most_common_freqs是MCV频率的列表。
 
-一个简单的例子如下所示。["countries"](javascript:void(0)) 表有两列：存储国家名称的列‘country’和存储国家所属的大陆名称的列‘continent’。
+>一个简单的例子如下所示。["countries"](javascript:void(0)) 表有两列：存储国家名称的列‘country’和存储国家所属的大陆名称的列‘continent’。
 
-```sql
-testdb=# \d countries
-   Table "public.countries"
-  Column   | Type | Modifiers 
------------+------+-----------
- country   | text | 
- continent | text | 
-Indexes:
-    "continent_idx" btree (continent)
+>```sql
+>testdb=# \d countries
+>  Table "public.countries"
+> Column   | Type | Modifiers 
+>-----------+------+-----------
+>country   | text | 
+>continent | text | 
+>Indexes:
+>   "continent_idx" btree (continent)
+>   testdb=# SELECT continent, count(*) AS "number of countries", 
+>testdb-#     (count(*)/(SELECT count(*) FROM countries)::real) AS "number of countries / all countries"
+>testdb-#       FROM countries GROUP BY continent ORDER BY "number of countries" DESC;
+>   continent   | number of countries | number of countries / all countries 
+>---------------+---------------------+-------------------------------------
+> Africa        |                  53 |                   0.274611398963731
+> Europe        |                  47 |                   0.243523316062176
+> Asia          |                  44 |                   0.227979274611399
+> North America |                  23 |                   0.119170984455959
+> Oceania       |                  14 |                  0.0725388601036269
+> South America |                  12 |                  0.0621761658031088
+>(6 rows)
+>```
 
-testdb=# SELECT continent, count(*) AS "number of countries", 
-testdb-#     (count(*)/(SELECT count(*) FROM countries)::real) AS "number of countries / all countries"
-testdb-#       FROM countries GROUP BY continent ORDER BY "number of countries" DESC;
-   continent   | number of countries | number of countries / all countries 
----------------+---------------------+-------------------------------------
- Africa        |                  53 |                   0.274611398963731
- Europe        |                  47 |                   0.243523316062176
- Asia          |                  44 |                   0.227979274611399
- North America |                  23 |                   0.119170984455959
- Oceania       |                  14 |                  0.0725388601036269
- South America |                  12 |                  0.0621761658031088
-(6 rows)
-```
+>让我们考虑一下WHERE子句'continent ='Asia''的查询：
 
-让我们考虑一下WHERE子句'continent ='Asia''的查询：
-
-```sql
+>```sql
 testdb=# SELECT * FROM countries WHERE continent = 'Asia';
-```
+>```
 
-在这种情况下，优化器使用‘continent’列的MCV估算索引扫描成本。 下面显示了此列的most_common_vals和most_common_freqs：
+>在这种情况下，优化器使用‘continent’列的MCV估算索引扫描成本。 下面显示了此列的most_common_vals和most_common_freqs：
 
-```sql
+>```sql
 testdb=# \x
 Expanded display is on.
 testdb=# SELECT most_common_vals, most_common_freqs FROM pg_stats 
@@ -368,37 +383,37 @@ testdb-#                  WHERE tablename = 'countries' AND attname='continent';
 -[ RECORD 1 ]-----+-------------------------------------------------------------
 most_common_vals  | {Africa,Europe,Asia,"North America",Oceania,"South America"}
 most_common_freqs | {0.274611,0.243523,0.227979,0.119171,0.0725389,0.0621762}
-```
+>```
 
-most_common_vals的'Asia'对应的most_common_freqs的值为0.227979。 因此，在此估计中使用0.227979作为selectivity。
+> most_common_vals的'Asia'对应的most_common_freqs的值为0.227979。 因此，在此估计中使用0.227979作为selectivity。
 
-如果不能使用MCV，则使用目标列的histogram_bounds的值来估计成本。
+> 如果不能使用MCV，则使用目标列的histogram_bounds的值来估计成本。
 
-- **histogram_bounds** 是将列值分成数量大致相等的值的列表。
+>- **histogram_bounds** 是将列值分成数量大致相等的值的列表。
 
-一个具体的例子。 这是表'tbl'中列'data'的histogram_bounds的值：
+> 一个具体的例子。 这是表'tbl'中列'data'的histogram_bounds的值：
 
-```sql
-testdb=# SELECT histogram_bounds FROM pg_stats WHERE tablename = 'tbl' AND attname = 'data';
-        			     	      histogram_bounds
----------------------------------------------------------------------------------------------------
- {1,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,
-2200,2300,2400,2500,2600,2700,2800,2900,3000,3100,3200,3300,3400,3500,3600,3700,3800,3900,4000,4100,
-4200,4300,4400,4500,4600,4700,4800,4900,5000,5100,5200,5300,5400,5500,5600,5700,5800,5900,6000,6100,
-6200,6300,6400,6500,6600,6700,6800,6900,7000,7100,7200,7300,7400,7500,7600,7700,7800,7900,8000,8100,
-8200,8300,8400,8500,8600,8700,8800,8900,9000,9100,9200,9300,9400,9500,9600,9700,9800,9900,10000}
-(1 row)
-```
+>```sql
+>testdb=# SELECT histogram_bounds FROM pg_stats WHERE tablename = 'tbl' AND attname = 'data';
+>        			     	      histogram_bounds
+>---------------------------------------------------------------------------------------------------
+> {1,100,200,300,400,500,600,700,800,900,1000,1100,1200,1300,1400,1500,1600,1700,1800,1900,2000,2100,
+>2200,2300,2400,2500,2600,2700,2800,2900,3000,3100,3200,3300,3400,3500,3600,3700,3800,3900,4000,4100,
+>4200,4300,4400,4500,4600,4700,4800,4900,5000,5100,5200,5300,5400,5500,5600,5700,5800,5900,6000,6100,
+>6200,6300,6400,6500,6600,6700,6800,6900,7000,7100,7200,7300,7400,7500,7600,7700,7800,7900,8000,8100,
+>8200,8300,8400,8500,8600,8700,8800,8900,9000,9100,9200,9300,9400,9500,9600,9700,9800,9900,10000}
+>(1 row)
+>```
 
-默认情况下，histogram_bounds被分成100个桶。 图3.7展示了这个例子中的桶和相应的histogram_bounds。 存储桶从0开始编号，每个存储桶(大约)存储相同数量的元组。 histogram_bounds的值是相应桶的边界。 例如，histogram_bounds的第0个值是1，这意味着它是存储在bucket_0中的元组的最小值; 第一个值是100，这是存储在bucket_1中的元组的最小值，依此类推。
+> 默认情况下，histogram_bounds被分成100个桶。 图3.7展示了这个例子中的桶和相应的histogram_bounds。 存储桶从0开始编号，每个存储桶(大约)存储相同数量的元组。 histogram_bounds的值是相应桶的边界。 例如，histogram_bounds的第0个值是1，这意味着它是存储在bucket_0中的元组的最小值; 第一个值是100，这是存储在bucket_1中的元组的最小值，依此类推。
 
-**图. 3.7. Buckets and histogram_bounds.**
+> **图. 3.7. Buckets and histogram_bounds.**
 
-![Fig. 3.7. Buckets and histogram_bounds.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch3/fig-3-07.png?raw=true)
+> ![Fig. 3.7. Buckets and histogram_bounds.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch3/fig-3-07.png?raw=true)
 
-接下来，将使用本小节中的示例计算selectivity。 查询有一个WHERE子句'data <240'，值'240'在第二个桶中。 在这种情况下，selectivity可以通过linear interpolation得出; 因此，使用以下等式来计算该查询中列'数据'的selectivity：
+> 接下来，将使用本小节中的示例计算selectivity。 查询有一个WHERE子句'data <240'，值'240'在第二个桶中。 在这种情况下，selectivity可以通过linear interpolation得出; 因此，使用以下等式来计算该查询中列'数据'的selectivity：
 
-​	(6) Selectivity = $\frac{2+(240−hb[2])/(hb[3]−hb[2])}{100}$ = $\frac{2+(240−200)/(300−200)}{100}$ = $\frac{2+40/100}{100}$ = 0.024.
+> ​	(6) Selectivity = $\frac{2+(240−hb[2])/(hb[3]−hb[2])}{100}$ = $\frac{2+(240−200)/(300−200)}{100}$ = $\frac{2+40/100}{100}$ = 0.024.
 
  因此，根据 (1),(3),(4) and (6),
 
@@ -440,11 +455,13 @@ indexCorrelation在下面详细描述，在这个例子中，
 
 ​	(14) ‘run cost’ = (1.8 + 2.4) + (4.0 + 5.0) = 13.2.
 
-索引相关性(Index Correlation)是列值的物理行排序与逻辑排序之间的统计相关性(引自官方文档)。 这范围从$-1$到 $+1$。 为了理解索引扫描和索引相关性之间的关系，下面给出一个具体示例。
 
-表tbl_corr有五列：两列是文本类型，三列是整数类型。 三个整数列存储从1到12的数字。物理上，tbl_corr由三个page页组成，每个页有四个元组。 每个整数类型列都有一个名称为index_col_asc的索引，依此类推。
 
-```sql
+> :pushpin: 索引相关性(Index Correlation)是列值的物理行排序与逻辑排序之间的统计相关性(引自官方文档)。 这范围从$-1$到 $+1$。 为了理解索引扫描和索引相关性之间的关系，下面给出一个具体示例。
+
+> 表tbl_corr有五列：两列是文本类型，三列是整数类型。 三个整数列存储从1到12的数字。物理上，tbl_corr由三个page页组成，每个页有四个元组。 每个整数类型列都有一个名称为index_col_asc的索引，依此类推。
+
+>```sql
 testdb=# \d tbl_corr
     Table "public.tbl_corr"
   Column  |  Type   | Modifiers 
@@ -458,9 +475,9 @@ Indexes:
     "tbl_corr_asc_idx" btree (col_asc)
     "tbl_corr_desc_idx" btree (col_desc)
     "tbl_corr_rand_idx" btree (col_rand)
-```
+>```
 
-```sql
+>```sql
 testdb=# SELECT col,col_asc,col_desc,col_rand 
 testdb-#                         FROM tbl_corr;
    col    | col_asc | col_desc | col_rand 
@@ -478,11 +495,11 @@ testdb-#                         FROM tbl_corr;
  Tuple_11 |      11 |        2 |       12
  Tuple_12 |      12 |        1 |        6
 (12 rows)
-```
+>```
 
-这些列的索引相关性如下所示：
+> 这些列的索引相关性如下所示：
 
-```sql
+>```sql
 testdb=# SELECT tablename,attname, correlation FROM pg_stats WHERE tablename = 'tbl_corr';
  tablename | attname  | correlation 
 -----------+----------+-------------
@@ -490,25 +507,25 @@ testdb=# SELECT tablename,attname, correlation FROM pg_stats WHERE tablename = '
  tbl_corr  | col_desc |          -1
  tbl_corr  | col_rand |    0.125874
 (3 rows)
-```
+>```
 
-当执行以下查询时，PostgreSQL只读取第一页，因为所有目标元组都存储在第一页中。 参考图3.8(a)。
+> 当执行以下查询时，PostgreSQL只读取第一页，因为所有目标元组都存储在第一页中。 参考图3.8(a)。
 
-```sql
+>```sql
 testdb=# SELECT * FROM tbl_corr WHERE col_asc BETWEEN 2 AND 4;
-```
+>```
 
-另一方面，当执行以下查询时，PostgreSQL必须读取所有页。 参考图3.8(b).
+> 另一方面，当执行以下查询时，PostgreSQL必须读取所有页。 参考图3.8(b).
 
-```sql
+>```sql
 testdb=# SELECT * FROM tbl_corr WHERE col_rand BETWEEN 2 AND 4;
-```
+>```
 
-这样，索引相关性是一种统计相关性，它反映了在估计索引扫描成本时表中索引排序和表中物理元组排序之间的扭曲所引起的随机访问的影响。
+> 这样，索引相关性是一种统计相关性，它反映了在估计索引扫描成本时表中索引排序和表中物理元组排序之间的扭曲所引起的随机访问的影响。
 
-**图. 3.8. 索引相关性**
+> **图. 3.8. 索引相关性**
 
-![Fig. 3.8. Index correlation.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch3/fig-3-08.png?raw=true)
+> ![Fig. 3.8. Index correlation.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch3/fig-3-08.png?raw=true)
 
  
 
@@ -533,11 +550,13 @@ Index Scan using tbl_data_idx on tbl  (cost=0.29..13.49 rows=240 width=8)
 
 在第5行中，显示了索引扫描的索引条件‘Index Cond:(data < 240)’。 更确切地说，这个条件被称为*访问谓词access predicate*，它表达了索引扫描的开始和结束条件。
 
-根据这篇[文章](http://use-the-index-luke.com/sql/explain-plan/postgresql/filter-predicates)，PostgreSQL中的EXPLAIN命令不区分访问谓词和索引过滤器谓词。 因此，如果您分析EXPLAIN的输出，不仅要注意索引条件，还要注意行的估计值。
+> :exclamation: 根据这篇[文章](http://use-the-index-luke.com/sql/explain-plan/postgresql/filter-predicates)，PostgreSQL中的EXPLAIN命令不区分访问谓词和索引过滤器谓词。 因此，如果您分析EXPLAIN的输出，不仅要注意索引条件，还要注意行的估计值。
 
-*seq_page_cost and random_page_cost*
 
-[seq_page_cost](https://www.postgresql.org/docs/10/static/runtime-config-query.html#GUC-SEQ-PAGE-COST)和[random_page_cost](https://www.postgresql.org/docs/10/static/runtime-config-query.html#GUC-RANDOM-PAGE-COST) 的默认值分别是1.0和4.0。 这意味着PostgeSQL假定随机扫描比顺序扫描慢四倍; 很明显，PostgreSQL的默认值是基于使用硬盘HDD。
+
+> :pushpin: *seq_page_cost and random_page_cost*
+
+> [seq_page_cost](https://www.postgresql.org/docs/10/static/runtime-config-query.html#GUC-SEQ-PAGE-COST)和[random_page_cost](https://www.postgresql.org/docs/10/static/runtime-config-query.html#GUC-RANDOM-PAGE-COST) 的默认值分别是1.0和4.0。 这意味着PostgeSQL假定随机扫描比顺序扫描慢四倍; 很明显，PostgreSQL的默认值是基于使用硬盘HDD。
 
 另一方面，近几天，由于主要使用SSD，因此random_page_cost的默认值太大。 如果尽管使用了SSD，仍然使用了默认值random_page_cost，但优化器可能会选择无效的计划。 因此，使用SSD时，最好将random_page_cost的值更改为1.0。
 
@@ -750,7 +769,11 @@ testdb=# SELECT * FROM tbl_2 WHERE id < 240;
 
    接下来，为tbl_2_data_idx创建IndexPath，估计成本并将此IndexPath添加到pathlist。 在这个例子中，没有与tbl_2_data_idx索引相关的WHERE子句; 因此，索引子句是NULL。
 
-请注意，add_path()函数并不总是添加路径。 由于这种操作的复杂性，细节被省略。 有关详细信息，请参阅add_path()函数的注释。
+
+
+> :exclamation: 请注意，add_path()函数并不总是添加路径。 由于这种操作的复杂性，细节被省略。 有关详细信息，请参阅add_path()函数的注释。
+
+
 
 6. 创建一个新的RelOptInfo结构
 
@@ -828,37 +851,39 @@ Sort  (cost=182.34..183.09 rows=300 width=8)
 
 
 
-尽管执行器使用存储器分配的work_men和temp_buffers进行查询处理，但如果仅在内存中执行处理，它将使用临时文件。
+> :pushpin: *Temporary Files* 
 
-使用ANALYZE选项，EXPLAIN命令实际上执行查询并显示实际的行数、运行时间和内存使用情况。 具体示例如下所示：
+> 尽管执行器使用存储器分配的work_men和temp_buffers进行查询处理，但如果仅在内存中执行处理，它将使用临时文件。
 
-```sql
-testdb=# EXPLAIN ANALYZE SELECT id, data FROM tbl_25m ORDER BY id;
-						QUERY PLAN                                                        
--------------------------------------------------------------------------------------------------------------------------- 
-Sort  (cost=3944070.01..3945895.01 rows=730000 width=4104) (actual time=885.648..1033.746 rows=730000 loops=1)   
-	Sort Key: id   
-	Sort Method: external sort  Disk: 10000kB   
-	->  Seq Scan on tbl_25m  (cost=0.00..10531.00 rows=730000 width=4104) (actual time=0.024..102.548 rows=730000 loops=1) 
-Planning time: 1.548 ms 
-Execution time: 1109.571 ms
-(6 rows)
-```
+> 使用ANALYZE选项，EXPLAIN命令实际上执行查询并显示实际的行数、运行时间和内存使用情况。 具体示例如下所示：
 
-在第6行中，EXPLAIN命令显示执行程序使用了一个大小为10000kB的临时文件。
+>```sql
+>1, testdb=# EXPLAIN ANALYZE SELECT id, data FROM tbl_25m ORDER BY id;
+>2,                          QUERY PLAN                         
+>3, ---------------------------------------------------------------------------
+>4,  Sort  (cost=3944070.01..3945895.01 rows=730000 width=4104) (actual time=885.648..1033.746 rows=730000 loops=1)
+>5,    Sort Key: id
+>6,    Sort Method: external sort  Disk: 10000kB
+>7,    ->  Seq Scan on tbl_25m  (cost=0.00..10531.00 rows=730000 width=4104) (actual time=0.024..102.548 rows=730000 loops=1)
+>8,  Planning time: 1.548 ms
+>9,  Execution time: 1109.571 ms
+>10, (6 rows)                                                    
+>```
 
-临时文件暂时在base/pg_tmp子目录中创建，命名方法如下所示。
+> 在第6行中，EXPLAIN命令显示执行程序使用了一个大小为10000kB的临时文件。
 
-```shell
+> 临时文件暂时在base/pg_tmp子目录中创建，命名方法如下所示。
+
+>```shell
 {"pgsql_tmp"} + {PID of the postgres process which creates the file} . {sequencial number from 0}
-```
+>```
 
-例如，临时文件‘pgsql_tmp8903.5’”是由PID为8903的Postgres进程创建的第6个临时文件。 
+> 例如，临时文件‘pgsql_tmp8903.5’”是由PID为8903的Postgres进程创建的第6个临时文件。 
 
-```shell
+>```shell
 $ ls -la /usr/local/pgsql/data/base/pgsql_tmp*
 -rw-------  1 postgres  postgres  10240000 12  4 14:18 pgsql_tmp8903.5
-```
+>```
 
  
 
@@ -908,9 +933,11 @@ nested loop join的成本总是可以估计的，但这种连接操作很少使�
 
  
 
-*临时元组存储 Temporary Tuple Storage*
+> :pushpin: *临时元组存储 Temporary Tuple Storage*
 
-PostgreSQL内部提供了一个临时元组存储模块，用于在hybrid hash join中创建batch等等。  这个模块由[tuplestore.c](https://github.com/postgres/postgres/blob/master/src/backend/utils/sort/tuplestore.c)中定义的函数组成，它们存储并从work_mem或临时文件中读取一系列元组。 是否使用work_mem或临时文件取决于要存储的元组的总大小。
+> PostgreSQL内部提供了一个临时元组存储模块，用于在hybrid hash join中创建batch等等。  这个模块由[tuplestore.c](https://github.com/postgres/postgres/blob/master/src/backend/utils/sort/tuplestore.c)中定义的函数组成，它们存储并从work_mem或临时文件中读取一系列元组。 是否使用work_mem或临时文件取决于要存储的元组的总大小。
+
+
 
 我们将探究执行器如何处理materialized nested loop join的计划树，以及如何使用下面显示的特定示例估算成本。
 
@@ -1330,9 +1357,13 @@ testdb=# SELECT * FROM tbl_a AS a, tbl_b as b WHERE a.id = b.id;
 
 为了得到最优的计划树，优化器必须考虑所有索引的组合和连接方法的可能性。 这是一个非常昂贵的过程，如果由于组合爆炸导致表的数量超过某个水平，这将是不可行的。 幸运的是，如果表的数量少于12个左右，优化器可以通过动态规划来获得最优计划。 否则，优化器使用遗传算法。 请参阅下面的内容。
 
-*遗传查询优化器 Genetic Query Optimizer*
 
-当执行连接多个表的查询时，需要大量的时间来优化查询计划。 为了处理这种情况，PostgreSQL实现了一个有趣的功能：[Genetic Query Optimizer](http://www.postgresql.org/docs/current/static/geqo.html)。 这是一种在合理时间内确定合理计划的近似算法。 因此，在查询优化阶段，如果连接表的数量高于参数[geqo_threshold](http://www.postgresql.org/docs/current/static/runtime-config-query.html#GUC-GEQO-THRESHOLD)指定的阈值(缺省值为12)，PostgreSQL使用遗传算法生成查询计划。 
+
+> :pushpin: *遗传查询优化器 Genetic Query Optimizer*
+
+> 当执行连接多个表的查询时，需要大量的时间来优化查询计划。 为了处理这种情况，PostgreSQL实现了一个有趣的功能：[Genetic Query Optimizer](http://www.postgresql.org/docs/current/static/geqo.html)。 这是一种在合理时间内确定合理计划的近似算法。 因此，在查询优化阶段，如果连接表的数量高于参数[geqo_threshold](http://www.postgresql.org/docs/current/static/runtime-config-query.html#GUC-GEQO-THRESHOLD)指定的阈值(缺省值为12)，PostgreSQL使用遗传算法生成查询计划。 
+
+
 
 以下步骤描述通过动态规划确定最优计划树：
 

@@ -127,15 +127,19 @@ sampledb=# SELECT relname, oid, relfilenode FROM pg_class WHERE relname = 'sampl
 (1 row)
 ```
 
-在9.0或更高版本中，内置函数*pg_relation_filepath*非常有用，因为此函数会返回指定OID或名称的*relation*的文件路径名。
 
-```sql
-sampledb=# SELECT pg_relation_filepath('sampletbl');
- pg_relation_filepath 
-----------------------
- base/16384/18812
-(1 row)
-```
+
+> :pushpin: 在9.0或更高版本中，内置函数*pg_relation_filepath*非常有用，因为此函数会返回指定OID或名称的*relation*的文件路径名。
+
+>```sql
+>sampledb=# SELECT pg_relation_filepath('sampletbl');
+>pg_relation_filepath 
+>----------------------
+> base/16384/18812
+>(1 row)
+>```
+
+
 
 当表和索引的文件大小超过1GB时，PostgreSQL会创建一个名为relfilenode.1的新文件并使用它。 如果新文件已经填满，则会创建名为relfilenode.2的下一个新文件，依此类推。
 
@@ -147,7 +151,11 @@ $ ls -la -h base/16384/19427*
 ...
 ```
 
-在构建PostgreSQL时可以使用--with-segsize配置选项，更改表和索引的最大文件大小。
+
+
+>:pushpin: 在构建PostgreSQL时可以使用--with-segsize配置选项，更改表和索引的最大文件大小。
+
+
 
 仔细查看数据库子目录，您会发现每个表都有两个相关的文件，分别以'fsm'和'vm'作为后缀。 这些被称为**空闲空间映射表(free space map)**和**可见性映射表(visibility map)**，分别在表文件中存储每个页面的空闲空间容量和可见性的信息(更详细的信息见第5.3.4节和第6.2节)。索引只有空闲空间映射，没有可见性映射。
 
@@ -244,7 +252,11 @@ page页的内部结构取决于数据文件类型。 在本节中，将描述表
 
 为了标识表中的元组，在内部使用**元组标识符(tuple identifier)（TID）**。 一个TID包含一对值：包含该元组的页面的块号，以及指向该元组的行指针的偏移号。 其典型的应用实例是索引。 更多细节见第1.4.2节。
 
-PageHeaderData结构在 [src/include/storage/bufpage.h](https://github.com/postgres/postgres/blob/master/src/include/storage/bufpage.h).
+
+
+> :pushpin: PageHeaderData结构在 [src/include/storage/bufpage.h](https://github.com/postgres/postgres/blob/master/src/include/storage/bufpage.h).
+
+
 
 另外，使用称为**TOAST**（The Oversized-Attribute Storage Technique）的方法存储和管理大小大于约2KB（约为8KB的1/4）的堆元组。 有关详细信息，请参阅 [PostgreSQL 文档](http://www.postgresql.org/docs/current/static/storage-toast.html)。
 
@@ -273,18 +285,18 @@ PageHeaderData结构在 [src/include/storage/bufpage.h](https://github.com/postg
 
 ![Fig. 1.6. Sequential scan and index scan.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch1/fig-1-06.png?raw=true)
 
- PostgreSQL也支持TID扫描(TID-Scan)，[位图扫描](https://wiki.postgresql.org/wiki/Bitmap_Indexes)(Bitmap-Scan))和仅索引扫描(Index-Only-Scan)。
+> :pushpin: PostgreSQL也支持TID扫描(TID-Scan)，[位图扫描](https://wiki.postgresql.org/wiki/Bitmap_Indexes)(Bitmap-Scan))和仅索引扫描(Index-Only-Scan)。
 
-TID扫描(TID-Scan)是一种通过使用所需元组的TID直接访问元组的方法。 例如，要查找表中第0页的第一个元组，请发出以下查询：
+> TID扫描(TID-Scan)是一种通过使用所需元组的TID直接访问元组的方法。 例如，要查找表中第0页的第一个元组，请发出以下查询：
 
-```sql
-sampledb=# SELECT ctid, data FROM sampletbl WHERE ctid = '(0,1)';
- ctid  |   data    
--------+-----------
- (0,1) | AAAAAAAAA
-(1 row)
-```
+>```sql
+>sampledb=# SELECT ctid, data FROM sampletbl WHERE ctid = '(0,1)';
+> ctid  |   data    
+>-------+-----------
+> (0,1) | AAAAAAAAA
+>(1 row)
+>```
 
-Index-Only-Scan将在第7章中详细介绍。
+> Index-Only-Scan将在第7章中详细介绍。
 
  
