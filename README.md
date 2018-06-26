@@ -1,6 +1,6 @@
 # PostgreSQL的内部结构{docsify-ignore-all} 
 
-##### 针对数据库管理员和系统开发人员
+##### 适用于数据库管理员和系统开发人员
 
 ![Copyright Diego Zazzeo](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch0/puestas-fauna-mecanica-c.png?raw=true)
 
@@ -9,6 +9,7 @@
 - 作者： [Hironobu SUZUKI](http://www.interdb.jp/)
 - 原书名称：[《The Internals of PostgreSQL》](http://www.interdb.jp/pg/index.html)
 - 译者：[杨杰](https://yonj1e.github.io/young/) （[yonj1e@163.com](mailto:yonj1e@163.com) ）
+- 译文地址：[PostgreSQL的内部结构](https://yonj1e.github.io/The-Internals-of-PostgreSQL/#/)
 
 ## 法律声明
 
@@ -21,17 +22,17 @@
 ## 目录
 
 - [简介](ch0.md)
-- [第一章.](ch1.md) 数据库集群、数据库和表
-- [第二章.](ch2.md) 进程和内存结构
-- [第三章.](ch3.md) 查询处理
-- [第四章.](ch4.md) 外部表(FDW)和并行查询
-- [第五章.](ch5.md) 并发控制
-- [第六章.](ch6.md) VACUUM
-- [第七章.](ch7.md) HOT(Heap-Only-Tuple)技术和仅索引扫描(Index-Only Scans)
-- [第八章.](ch8.md) 缓冲区管理器
-- [第九章.](ch9.md) 预写式日志 (WAL)
-- [第十章.](ch10.md) 基础备份和时间点恢复 (PITR)
-- [第十一章.](ch11.md) 流复制
+- [第一章. 数据库集群、数据库和表](ch1.md) 
+- [第二章. 进程和内存结构](ch2.md) 
+- [第三章. 查询处理](ch3.md) 
+- [第四章. 外部表(FDW)和并行查询](ch4.md) 
+- [第五章. 并发控制](ch5.md) 
+- [第六章. VACUUM](ch6.md)
+- [第七章. HOT(Heap-Only-Tuple)技术和仅索引扫描(Index-Only Scans)](ch7.md) 
+- [第八章. 缓冲区管理器](ch8.md) 
+- [第九章. 预写式日志 (WAL)](ch9.md) 
+- [第十章. 基础备份和时间点恢复 (PITR)](ch10.md) 
+- [第十一章. 流复制](ch11.md) 
 
 ## 翻译计划
 
