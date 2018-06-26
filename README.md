@@ -1,4 +1,4 @@
-# PostgreSQL的内部结构
+# PostgreSQL的内部结构{docsify-ignore-all} 
 
 ##### 针对数据库管理员和系统开发人员
 
