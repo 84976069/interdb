@@ -1,10 +1,10 @@
 
 <!DOCTYPE HTML>
-<html lang="" >
+<html lang="zh-hans" >
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>README · GitBook</title>
+        <title>README · interdb</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.3">
@@ -15,6 +15,18 @@
     <link rel="stylesheet" href="gitbook/style.css">
 
     
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-anchors/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-advanced-emoji/emoji-website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-anchor-navigation-ex/style/plugin.css">
+                
             
                 
                 <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
@@ -49,6 +61,7 @@
         
     
     
+    
     <meta name="HandheldFriendly" content="true"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -61,6 +74,15 @@
     
     
 
+    
+        <link rel="shortcut icon" href='favicon.ico' type="image/x-icon">
+    
+    
+        <link rel="bookmark" href='favicon.ico' type="image/x-icon">
+    
+    
+    
+
     </head>
     <body>
         
@@ -69,7 +91,7 @@
         
             
 <div id="book-search-input" role="search">
-    <input type="text" placeholder="Type to search" />
+    <input type="text" placeholder="输入并搜索" />
 </div>
 
             
@@ -196,7 +218,7 @@
                 <a href="ch7.html">
             
                     
-                    第七章. HOT(Heap-Only-Tuple)技术和仅索引扫描(Index-Only Scans)
+                    第七章. HOT技术和仅索引扫描
             
                 </a>
             
@@ -254,6 +276,25 @@
             
 
             
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.13.1" data-path="ch11.html">
+            
+                <a href="ch11.html#112-如何进行流复制">
+            
+                    
+                    11.2. 如何进行流复制
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
         </li>
     
 
@@ -263,7 +304,7 @@
 
     <li>
         <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
-            Published with GitBook
+            本书使用 GitBook 发布
         </a>
     </li>
 </ul>
@@ -301,8 +342,8 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h1 id="postgresql&#x7684;&#x5185;&#x90E8;&#x7ED3;&#x6784;">PostgreSQL&#x7684;&#x5185;&#x90E8;&#x7ED3;&#x6784;</h1>
-<h5 id="&#x9488;&#x5BF9;&#x6570;&#x636E;&#x5E93;&#x7BA1;&#x7406;&#x5458;&#x548C;&#x7CFB;&#x7EDF;&#x5F00;&#x53D1;&#x4EBA;&#x5458;">&#x9488;&#x5BF9;&#x6570;&#x636E;&#x5E93;&#x7BA1;&#x7406;&#x5458;&#x548C;&#x7CFB;&#x7EDF;&#x5F00;&#x53D1;&#x4EBA;&#x5458;</h5>
+                                <div id="anchor-navigation-ex-navbar"><i class="fa fa-anchor"></i><ul><li><span class="title-icon "></span><a href="#postgresql&#x7684;&#x5185;&#x90E8;&#x7ED3;&#x6784;"><b>1. </b>PostgreSQL&#x7684;&#x5185;&#x90E8;&#x7ED3;&#x6784;</a></li><ul><li><span class="title-icon "></span><a href="#&#x6CD5;&#x5F8B;&#x58F0;&#x660E;"><b>1.1. </b>&#x6CD5;&#x5F8B;&#x58F0;&#x660E;</a></li><li><span class="title-icon "></span><a href="#&#x76EE;&#x5F55;"><b>1.2. </b>&#x76EE;&#x5F55;</a></li><li><span class="title-icon "></span><a href="#&#x7FFB;&#x8BD1;&#x8BA1;&#x5212;"><b>1.3. </b>&#x7FFB;&#x8BD1;&#x8BA1;&#x5212;</a></li><li><span class="title-icon "></span><a href="#license"><b>1.4. </b>LICENSE</a></li></ul></ul></div><a href="#postgresql&#x7684;&#x5185;&#x90E8;&#x7ED3;&#x6784;" id="anchorNavigationExGoTop"><i class="fa fa-arrow-up"></i></a><h1 id="postgresql&#x7684;&#x5185;&#x90E8;&#x7ED3;&#x6784;"><a name="postgresql&#x7684;&#x5185;&#x90E8;&#x7ED3;&#x6784;" class="anchor-navigation-ex-anchor" href="#postgresql&#x7684;&#x5185;&#x90E8;&#x7ED3;&#x6784;"><i class="fa fa-link" aria-hidden="true"></i></a>1. PostgreSQL&#x7684;&#x5185;&#x90E8;&#x7ED3;&#x6784;</h1>
+<h5 id="&#x9488;&#x5BF9;&#x6570;&#x636E;&#x5E93;&#x7BA1;&#x7406;&#x5458;&#x548C;&#x7CFB;&#x7EDF;&#x5F00;&#x53D1;&#x4EBA;&#x5458;"><a name="&#x9488;&#x5BF9;&#x6570;&#x636E;&#x5E93;&#x7BA1;&#x7406;&#x5458;&#x548C;&#x7CFB;&#x7EDF;&#x5F00;&#x53D1;&#x4EBA;&#x5458;" class="anchor-navigation-ex-anchor" href="#&#x9488;&#x5BF9;&#x6570;&#x636E;&#x5E93;&#x7BA1;&#x7406;&#x5458;&#x548C;&#x7CFB;&#x7EDF;&#x5F00;&#x53D1;&#x4EBA;&#x5458;"><i class="fa fa-link" aria-hidden="true"></i></a><a name="&#x9488;&#x5BF9;&#x6570;&#x636E;&#x5E93;&#x7BA1;&#x7406;&#x5458;&#x548C;&#x7CFB;&#x7EDF;&#x5F00;&#x53D1;&#x4EBA;&#x5458;" class="plugin-anchor" href="#&#x9488;&#x5BF9;&#x6570;&#x636E;&#x5E93;&#x7BA1;&#x7406;&#x5458;&#x548C;&#x7CFB;&#x7EDF;&#x5F00;&#x53D1;&#x4EBA;&#x5458;"><i class="fa fa-link" aria-hidden="true"></i></a>&#x9488;&#x5BF9;&#x6570;&#x636E;&#x5E93;&#x7BA1;&#x7406;&#x5458;&#x548C;&#x7CFB;&#x7EDF;&#x5F00;&#x53D1;&#x4EBA;&#x5458;</h5>
 <p><img src="https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch0/puestas-fauna-mecanica-c.png?raw=true" alt="Copyright Diego Zazzeo"></p>
 <hr>
 <ul>
@@ -310,11 +351,11 @@
 <li>&#x539F;&#x4E66;&#x540D;&#x79F0;&#xFF1A;<a href="http://www.interdb.jp/pg/index.html" target="_blank">&#x300A;The Internals of PostgreSQL&#x300B;</a></li>
 <li>&#x8BD1;&#x8005;&#xFF1A;<a href="https://yonj1e.github.io/young/" target="_blank">&#x6768;&#x6770;</a> &#xFF08;<a href="mailto:yonj1e@163.com" target="_blank">yonj1e@163.com</a> &#xFF09;</li>
 </ul>
-<h2 id="&#x6CD5;&#x5F8B;&#x58F0;&#x660E;">&#x6CD5;&#x5F8B;&#x58F0;&#x660E;</h2>
+<h2 id="&#x6CD5;&#x5F8B;&#x58F0;&#x660E;"><a name="&#x6CD5;&#x5F8B;&#x58F0;&#x660E;" class="anchor-navigation-ex-anchor" href="#&#x6CD5;&#x5F8B;&#x58F0;&#x660E;"><i class="fa fa-link" aria-hidden="true"></i></a>1.1. &#x6CD5;&#x5F8B;&#x58F0;&#x660E;</h2>
 <p>&#x8BD1;&#x8005;&#x7EAF;&#x7CB9;&#x51FA;&#x4E8E;<strong>&#x5B66;&#x4E60;&#x76EE;&#x7684;</strong>&#x4E0E;<strong>&#x4E2A;&#x4EBA;&#x5174;&#x8DA3;</strong>&#x7FFB;&#x8BD1;&#x672C;&#x4E66;&#xFF0C;&#x4E0D;&#x8FFD;&#x6C42;&#x4EFB;&#x4F55;&#x7ECF;&#x6D4E;&#x5229;&#x76CA;&#x3002;</p>
 <p>&#x8BD1;&#x8005;&#x4FDD;&#x7559;&#x5BF9;&#x6B64;&#x7248;&#x672C;&#x8BD1;&#x6587;&#x7684;&#x7F72;&#x540D;&#x6743;&#xFF0C;&#x5176;&#x4ED6;&#x6743;&#x5229;&#x4EE5;&#x539F;&#x4F5C;&#x8005;&#x548C;&#x51FA;&#x7248;&#x793E;&#x7684;&#x4E3B;&#x5F20;&#x4E3A;&#x51C6;&#x3002;</p>
 <p>&#x672C;&#x8BD1;&#x6587;&#x53EA;&#x4F9B;&#x5B66;&#x4E60;&#x7814;&#x7A76;&#x53C2;&#x8003;&#x4E4B;&#x7528;&#xFF0C;&#x4E0D;&#x5F97;&#x516C;&#x5F00;&#x4F20;&#x64AD;&#x53D1;&#x884C;&#x6216;&#x7528;&#x4E8E;&#x5546;&#x4E1A;&#x7528;&#x9014;&#x3002;</p>
-<h2 id="&#x76EE;&#x5F55;">&#x76EE;&#x5F55;</h2>
+<h2 id="&#x76EE;&#x5F55;"><a name="&#x76EE;&#x5F55;" class="anchor-navigation-ex-anchor" href="#&#x76EE;&#x5F55;"><i class="fa fa-link" aria-hidden="true"></i></a>1.2. &#x76EE;&#x5F55;</h2>
 <ul>
 <li><a href="ch0.html">&#x7B80;&#x4ECB;</a></li>
 <li><a href="ch1.html">&#x7B2C;&#x4E00;&#x7AE0;.</a> &#x6570;&#x636E;&#x5E93;&#x96C6;&#x7FA4;&#x3001;&#x6570;&#x636E;&#x5E93;&#x548C;&#x8868;</li>
@@ -329,10 +370,10 @@
 <li><a href="ch10.html">&#x7B2C;&#x5341;&#x7AE0;.</a> &#x57FA;&#x7840;&#x5907;&#x4EFD;&#x548C;&#x65F6;&#x95F4;&#x70B9;&#x6062;&#x590D; (PITR)</li>
 <li><a href="ch11.html">&#x7B2C;&#x5341;&#x4E00;&#x7AE0;.</a> &#x6D41;&#x590D;&#x5236;</li>
 </ul>
-<h2 id="&#x7FFB;&#x8BD1;&#x8BA1;&#x5212;">&#x7FFB;&#x8BD1;&#x8BA1;&#x5212;</h2>
+<h2 id="&#x7FFB;&#x8BD1;&#x8BA1;&#x5212;"><a name="&#x7FFB;&#x8BD1;&#x8BA1;&#x5212;" class="anchor-navigation-ex-anchor" href="#&#x7FFB;&#x8BD1;&#x8BA1;&#x5212;"><i class="fa fa-link" aria-hidden="true"></i></a>1.3. &#x7FFB;&#x8BD1;&#x8BA1;&#x5212;</h2>
 <p>&#x5DE5;&#x4F5C;&#x4E1A;&#x4F59;&#x65F6;&#x95F4;&#x7FFB;&#x8BD1;&#x5B66;&#x4E60;&#xFF0C;&#x65E0;&#x804A;&#x4E00;&#x8D77;&#x9020;&#x4F5C;&#x554A;~</p>
 <p><img src="https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch0/me.jpg?raw=true" alt="wechat"></p>
-<h2 id="license">LICENSE</h2>
+<h2 id="license"><a name="license" class="anchor-navigation-ex-anchor" href="#license"><i class="fa fa-link" aria-hidden="true"></i></a>1.4. LICENSE</h2>
 <p>CC-BY 4.0</p>
 
                                 
@@ -373,7 +414,7 @@
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"README","level":"1.1","depth":1,"next":{"title":"简介","level":"1.2","depth":1,"path":"ch0.md","ref":"ch0.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["livereload"],"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"README.md","mtime":"2018-06-20T04:24:45.820Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-06-25T09:51:36.515Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"README","level":"1.1","depth":1,"next":{"title":"简介","level":"1.2","depth":1,"path":"ch0.md","ref":"ch0.md","articles":[]},"dir":"ltr"},"config":{"plugins":["anchors","advanced-emoji","github","favicon","anchor-navigation-ex","livereload"],"styles":{"ebook":"styles/ebook.css","epub":"styles/epub.css","mobi":"styles/mobi.css","pdf":"styles/pdf.css","print":"styles/print.css","website":"styles/website.css"},"pluginsConfig":{"github":{"url":"https://github.com/yonj1e/The-Internals-of-PostgreSQL"},"livereload":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"highlight":{},"anchor-navigation-ex":{"associatedWithSummary":false,"float":{"level1Icon":"","level2Icon":"","level3Icon":"","showLevelIcon":false},"mode":"float","multipleH1":true,"pageTop":{"level1Icon":"fa fa-hand-o-right","level2Icon":"fa fa-hand-o-right","level3Icon":"fa fa-hand-o-right","showLevelIcon":false},"printLog":false,"showLevel":true},"favicon":{"shortcut":"favicon.ico","bookmark":"favicon.ico"},"advanced-emoji":{"embedEmojis":false},"sharing":{"facebook":false,"twitter":false,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":[]},"theme-default":{"showLevel":false,"styles":{"ebook":"styles/ebook.css","epub":"styles/epub.css","mobi":"styles/mobi.css","pdf":"styles/pdf.css","print":"styles/print.css","website":"styles/website.css"}},"anchors":{}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"interdb","language":"zh-hans","links":{"gitbook":false,"sharing":{"google":false,"facebook":false,"twitter":false,"all":false}},"gitbook":"*"},"file":{"path":"README.md","mtime":"2018-06-20T04:24:45.820Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-06-26T04:05:07.877Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
@@ -381,6 +422,10 @@
         
     <script src="gitbook/gitbook.js"></script>
     <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-github/plugin.js"></script>
+        
     
         
         <script src="gitbook/gitbook-plugin-livereload/plugin.js"></script>

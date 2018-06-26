@@ -1,10 +1,10 @@
 
 <!DOCTYPE HTML>
-<html lang="" >
+<html lang="zh-hans" >
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>第十一章. 流复制 · GitBook</title>
+        <title>第十一章. 流复制 · interdb</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.3">
@@ -15,6 +15,18 @@
     <link rel="stylesheet" href="gitbook/style.css">
 
     
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-anchors/plugin.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-advanced-emoji/emoji-website.css">
+                
+            
+                
+                <link rel="stylesheet" href="gitbook/gitbook-plugin-anchor-navigation-ex/style/plugin.css">
+                
             
                 
                 <link rel="stylesheet" href="gitbook/gitbook-plugin-highlight/website.css">
@@ -49,6 +61,7 @@
         
     
     
+    
     <meta name="HandheldFriendly" content="true"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -57,8 +70,19 @@
     <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
 
     
+    <link rel="next" href="ch11.html" />
+    
     
     <link rel="prev" href="ch10.html" />
+    
+
+    
+        <link rel="shortcut icon" href='favicon.ico' type="image/x-icon">
+    
+    
+        <link rel="bookmark" href='favicon.ico' type="image/x-icon">
+    
+    
     
 
     </head>
@@ -69,7 +93,7 @@
         
             
 <div id="book-search-input" role="search">
-    <input type="text" placeholder="Type to search" />
+    <input type="text" placeholder="输入并搜索" />
 </div>
 
             
@@ -196,7 +220,7 @@
                 <a href="ch7.html">
             
                     
-                    第七章. HOT(Heap-Only-Tuple)技术和仅索引扫描(Index-Only Scans)
+                    第七章. HOT技术和仅索引扫描
             
                 </a>
             
@@ -254,6 +278,25 @@
             
 
             
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.13.1" data-path="ch11.html">
+            
+                <a href="ch11.html#112-如何进行流复制">
+            
+                    
+                    11.2. 如何进行流复制
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
         </li>
     
 
@@ -263,7 +306,7 @@
 
     <li>
         <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
-            Published with GitBook
+            本书使用 GitBook 发布
         </a>
     </li>
 </ul>
@@ -301,7 +344,7 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h2 id="&#x7B2C;11&#x7AE0;-&#x6D41;&#x590D;&#x5236;">&#x7B2C;11&#x7AE0; &#x6D41;&#x590D;&#x5236;</h2>
+                                <h2 id="&#x7B2C;11&#x7AE0;-&#x6D41;&#x590D;&#x5236;"><a name="&#x7B2C;11&#x7AE0;-&#x6D41;&#x590D;&#x5236;" class="anchor-navigation-ex-anchor" href="#&#x7B2C;11&#x7AE0;-&#x6D41;&#x590D;&#x5236;"><i class="fa fa-link" aria-hidden="true"></i></a><a name="&#x7B2C;11&#x7AE0;-&#x6D41;&#x590D;&#x5236;" class="plugin-anchor" href="#&#x7B2C;11&#x7AE0;-&#x6D41;&#x590D;&#x5236;"><i class="fa fa-link" aria-hidden="true"></i></a>&#x7B2C;11&#x7AE0; &#x6D41;&#x590D;&#x5236;</h2>
 <p> 9.1&#x7248;&#x672C;&#x4E2D;&#x5B9E;&#x73B0;&#x4E86;&#x540C;&#x6B65;&#x6D41;&#x590D;&#x5236;&#x3002; &#x5B83;&#x662F;&#x4E00;&#x79CD;&#x6240;&#x8C13;&#x7684;&#x4E00;&#x4E3B;&#x591A;&#x4ECE;&#x5F0F;&#x590D;&#x5236;&#xFF0C;&#x5728;PostgreSQL&#x4E2D;&#x8FD9;&#x4E24;&#x4E2A;&#x672F;&#x8BED;&#x901A;&#x5E38;&#x5206;&#x522B;&#x79F0;&#x4E3A;master&#x548C;slave(primary&#x548C;standby)&#x3002;</p>
 <p>&#x6D41;&#x590D;&#x5236;&#x529F;&#x80FD;&#x57FA;&#x4E8E;&#x65E5;&#x5FD7;&#x4F20;&#x8F93;&#xFF0C;&#x8FD9;&#x662F;&#x4E00;&#x79CD;&#x5E38;&#x89C4;&#x590D;&#x5236;&#x6280;&#x672F;&#xFF0C;&#x5176;&#x4E2D;&#x4E3B;&#x8282;&#x70B9;&#x6301;&#x7EED;&#x53D1;&#x9001;WAL&#x6570;&#x636E;&#xFF0C;&#x7136;&#x540E;&#x6BCF;&#x4E2A;&#x5907;&#x8282;&#x70B9;&#x7ACB;&#x5373;&#x91CD;&#x653E;&#x6536;&#x5230;&#x7684;&#x6570;&#x636E;&#x3002;</p>
 <p>&#x672C;&#x7AE0;&#x6DB5;&#x76D6;&#x4EE5;&#x4E0B;&#x5185;&#x5BB9;&#xFF0C;&#x91CD;&#x70B9;&#x4ECB;&#x7ECD;&#x6D41;&#x590D;&#x5236;&#x7684;&#x5DE5;&#x4F5C;&#x539F;&#x7406;&#xFF1A;</p>
@@ -312,9 +355,9 @@
 <li>&#x4E3B;&#x8282;&#x70B9;&#x5982;&#x4F55;&#x68C0;&#x6D4B;&#x5907;&#x8282;&#x70B9;&#x7684;&#x6545;&#x969C;</li>
 </ul>
 <blockquote>
-<p>:pushpin: &#x5F02;&#x6B65;&#x6D41;&#x590D;&#x5236;&#x5728;9.0&#x7248;&#x4E2D;&#x5B9E;&#x73B0;&#xFF0C;&#x4F46;&#x5B83;&#x5DF2;&#x88AB;9.1&#x4E2D;&#x7528;&#x4E8E;&#x540C;&#x6B65;&#x6D41;&#x590D;&#x5236;(&#x76EE;&#x524D;&#x6B63;&#x5728;&#x4F7F;&#x7528;)&#x6240;&#x53D6;&#x4EE3;&#x3002; </p>
+<p><img align="absmiddle" alt=":pushpin:" class="emoji" src="gitbook/gitbook-plugin-advanced-emoji/emojis/pushpin.png" title=":pushpin:"> &#x5F02;&#x6B65;&#x6D41;&#x590D;&#x5236;&#x5728;9.0&#x7248;&#x4E2D;&#x5B9E;&#x73B0;&#xFF0C;&#x4F46;&#x5B83;&#x5DF2;&#x88AB;9.1&#x4E2D;&#x7528;&#x4E8E;&#x540C;&#x6B65;&#x6D41;&#x590D;&#x5236;(&#x76EE;&#x524D;&#x6B63;&#x5728;&#x4F7F;&#x7528;)&#x6240;&#x53D6;&#x4EE3;&#x3002; </p>
 </blockquote>
-<h2 id="111-&#x542F;&#x52A8;&#x6D41;&#x590D;&#x5236;">11.1. &#x542F;&#x52A8;&#x6D41;&#x590D;&#x5236;</h2>
+<h2 id="111-&#x542F;&#x52A8;&#x6D41;&#x590D;&#x5236;"><a name="111-&#x542F;&#x52A8;&#x6D41;&#x590D;&#x5236;" class="anchor-navigation-ex-anchor" href="#111-&#x542F;&#x52A8;&#x6D41;&#x590D;&#x5236;"><i class="fa fa-link" aria-hidden="true"></i></a><a name="111-&#x542F;&#x52A8;&#x6D41;&#x590D;&#x5236;" class="plugin-anchor" href="#111-&#x542F;&#x52A8;&#x6D41;&#x590D;&#x5236;"><i class="fa fa-link" aria-hidden="true"></i></a>11.1. &#x542F;&#x52A8;&#x6D41;&#x590D;&#x5236;</h2>
 <p>&#x5728;&#x6D41;&#x590D;&#x5236;&#x4E2D;&#xFF0C;&#x4E09;&#x79CD;&#x8FDB;&#x7A0B;&#x534F;&#x540C;&#x5DE5;&#x4F5C;&#x3002; &#x4E3B;&#x8282;&#x70B9;&#x4E0A;&#x7684;<strong>walsender</strong>&#x8FDB;&#x7A0B;&#x5C06;WAL&#x6570;&#x636E;&#x53D1;&#x9001;&#x5230;&#x5907;&#x8282;&#x70B9;; &#x7136;&#x540E;&#xFF0C;&#x5907;&#x8282;&#x70B9;&#x4E0A;&#x7684;<strong>walreceiver</strong>&#x8FDB;&#x7A0B;&#x548C;<strong>startup</strong>&#x8FDB;&#x7A0B;&#x63A5;&#x6536;&#x5E76;&#x91CD;&#x653E;&#x8FD9;&#x4E9B;&#x6570;&#x636E;&#x3002; walsender&#x548C;walreceiver&#x4F7F;&#x7528;&#x5355;&#x4E2A;TCP&#x8FDE;&#x63A5;&#x8FDB;&#x884C;&#x901A;&#x4FE1;&#x3002;</p>
 <p>&#x5728;&#x672C;&#x8282;&#x4E2D;&#xFF0C;&#x6211;&#x4EEC;&#x5C06;&#x63A2;&#x7D22;&#x6D41;&#x590D;&#x5236;&#x7684;&#x542F;&#x52A8;&#x987A;&#x5E8F;&#xFF0C;&#x4EE5;&#x4E86;&#x89E3;&#x8FD9;&#x4E9B;&#x6D41;&#x7A0B;&#x662F;&#x5982;&#x4F55;&#x542F;&#x52A8;&#x7684;&#x4EE5;&#x53CA;&#x5B83;&#x4EEC;&#x4E4B;&#x95F4;&#x7684;&#x8FDE;&#x63A5;&#x662F;&#x5982;&#x4F55;&#x5EFA;&#x7ACB;&#x7684;&#x3002; &#x6D41;&#x590D;&#x5236;&#x7684;&#x542F;&#x52A8;&#x987A;&#x5E8F;&#x56FE;&#x5982;&#x56FE;11.1&#x6240;&#x793A;&#xFF1A;</p>
 <p><strong>&#x56FE;. 11.1. &#x6D41;&#x590D;&#x5236;&#x542F;&#x52A8;&#x987A;&#x5E8F;</strong></p>
@@ -345,14 +388,14 @@
 </code></pre>
 <p>&#x5982;&#x4E0A;&#x9762;&#x7684;&#x7ED3;&#x679C;&#x6240;&#x793A;&#xFF0C;&#x4E24;&#x4E2A;walsenders&#x6B63;&#x5728;&#x8FD0;&#x884C;&#x4E3A;&#x8FDE;&#x63A5;&#x7684;&#x5907;&#x8282;&#x70B9;&#x53D1;&#x9001;WAL&#x6570;&#x636E;&#xFF0C;&#x53E6;&#x4E00;&#x4E2A;&#x6B63;&#x5728;&#x8FD0;&#x884C;&#x4EE5;&#x53D1;&#x9001;&#x6570;&#x636E;&#x5E93;&#x96C6;&#x7FA4;&#x7684;&#x6240;&#x6709;&#x6587;&#x4EF6;&#x4EE5;&#x7528;&#x4E8E;<a href="http://www.postgresql.org/docs/current/static/app-pgbasebackup.html" target="_blank">pg_basebackup</a>&#x3002;</p>
 <blockquote>
-<p>:question: &#x200B;&#x5982;&#x679C;&#x5907;&#x8282;&#x70B9;&#x957F;&#x65F6;&#x95F4;&#x5B95;&#x673A;&#x91CD;&#x542F;&#x540E;&#x4F1A;&#x53D1;&#x751F;&#x4EC0;&#x4E48;&#x60C5;&#x51B5;&#xFF1F;</p>
+<p><img align="absmiddle" alt=":question:" class="emoji" src="gitbook/gitbook-plugin-advanced-emoji/emojis/question.png" title=":question:"> &#x200B;&#x5982;&#x679C;&#x5907;&#x8282;&#x70B9;&#x957F;&#x65F6;&#x95F4;&#x5B95;&#x673A;&#x91CD;&#x542F;&#x540E;&#x4F1A;&#x53D1;&#x751F;&#x4EC0;&#x4E48;&#x60C5;&#x51B5;&#xFF1F;</p>
 <p>&#x5728;&#x7248;&#x672C;9.3&#x6216;&#x66F4;&#x4F4E;&#x7248;&#x672C;&#x4E2D;&#xFF0C;&#x5982;&#x679C;&#x5907;&#x8282;&#x70B9;&#x6240;&#x9700;&#x7684;&#x4E3B;&#x8981;WAL&#x6BB5;&#x5DF2;&#x88AB;&#x56DE;&#x6536;&#xFF0C;&#x5219;&#x5907;&#x8282;&#x70B9;&#x65E0;&#x6CD5;&#x8DDF;&#x4E0A;&#x4E3B;&#x8282;&#x70B9;&#x3002;&#x5BF9;&#x4E8E;&#x8FD9;&#x4E2A;&#x95EE;&#x9898;&#x6CA1;&#x6709;&#x53EF;&#x9760;&#x7684;&#x89E3;&#x51B3;&#x65B9;&#x6848;&#xFF0C;&#x53EA;&#x662F;&#x4E3A;&#x4E86;&#x914D;&#x7F6E;&#x53C2;&#x6570;<a href="http://www.postgresql.org/docs/current/static/runtime-config-replication.html#GUC-WAL-KEEP-SEGMENTS" target="_blank">wal_keep_segments</a>&#x8BBE;&#x7F6E;&#x4E00;&#x4E2A;&#x5F88;&#x5927;&#x7684;&#x503C;&#x6765;&#x51CF;&#x5C11;&#x53D1;&#x751F;&#x7684;&#x53EF;&#x80FD;&#x6027;&#x3002;&#x8FD9;&#x53EA;&#x662F;&#x4E00;&#x4E2A;&#x6743;&#x5B9C;&#x4E4B;&#x8BA1;&#x3002;</p>
 <p>&#x5728;&#x7248;&#x672C;9.4&#x6216;&#x66F4;&#x9AD8;&#x7248;&#x672C;&#x4E2D;&#xFF0C;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x4F7F;&#x7528;&#x590D;&#x5236;&#x69FD;&#x6765;&#x9632;&#x6B62;&#x6B64;&#x95EE;&#x9898;&#x3002;&#x590D;&#x5236;&#x69FD;&#x662F;&#x4E00;&#x79CD;&#x6269;&#x5C55;WAL&#x6570;&#x636E;&#x53D1;&#x9001;&#x7075;&#x6D3B;&#x6027;&#x7684;&#x529F;&#x80FD;&#xFF0C;&#x4E3B;&#x8981;&#x7528;&#x4E8E;&#x903B;&#x8F91;&#x590D;&#x5236;&#xFF0C;&#x5B83;&#x8FD8;&#x4E3A;&#x6B64;&#x95EE;&#x9898;&#x63D0;&#x4F9B;&#x4E86;&#x89E3;&#x51B3;&#x65B9;&#x6848; - &#x5728;pg_xlog(&#x6216;pg_wal&#xFF0C;10&#x7248;&#x672C;&#x6216;&#x66F4;&#x9AD8;&#x7248;&#x672C;)&#x4E2D;&#x5305;&#x542B;&#x672A;&#x53D1;&#x9001;&#x6570;&#x636E;&#x7684;WAL&#x6BB5;&#x6587;&#x4EF6;)&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x6682;&#x505C;&#x56DE;&#x6536;&#x8FC7;&#x7A0B;&#x4FDD;&#x7559;&#x5728;&#x590D;&#x5236;&#x69FD;&#x4E2D;&#x3002;&#x8BE6;&#x7EC6;&#x8BF7;&#x53C2;&#x8003;<a href="http://www.postgresql.org/docs/current/static/warm-standby.html#STREAMING-REPLICATION-SLOTS" target="_blank">&#x5B98;&#x65B9;&#x6587;&#x6863;</a>&#x3002;</p>
 </blockquote>
-<h2 id="112-&#x5982;&#x4F55;&#x8FDB;&#x884C;&#x6D41;&#x590D;&#x5236;">11.2. &#x5982;&#x4F55;&#x8FDB;&#x884C;&#x6D41;&#x590D;&#x5236;</h2>
+<h2 id="112-&#x5982;&#x4F55;&#x8FDB;&#x884C;&#x6D41;&#x590D;&#x5236;"><a name="112-&#x5982;&#x4F55;&#x8FDB;&#x884C;&#x6D41;&#x590D;&#x5236;" class="anchor-navigation-ex-anchor" href="#112-&#x5982;&#x4F55;&#x8FDB;&#x884C;&#x6D41;&#x590D;&#x5236;"><i class="fa fa-link" aria-hidden="true"></i></a><a name="112-&#x5982;&#x4F55;&#x8FDB;&#x884C;&#x6D41;&#x590D;&#x5236;" class="plugin-anchor" href="#112-&#x5982;&#x4F55;&#x8FDB;&#x884C;&#x6D41;&#x590D;&#x5236;"><i class="fa fa-link" aria-hidden="true"></i></a>11.2. &#x5982;&#x4F55;&#x8FDB;&#x884C;&#x6D41;&#x590D;&#x5236;</h2>
 <p>&#x6D41;&#x590D;&#x5236;&#x6709;&#x4E24;&#x4E2A;&#x65B9;&#x9762;&#xFF1A;&#x65E5;&#x5FD7;&#x4F20;&#x9001;&#x548C;&#x6570;&#x636E;&#x5E93;&#x540C;&#x6B65;&#x3002; &#x65E5;&#x5FD7;&#x4F20;&#x9001;&#x663E;&#x7136;&#x662F;&#x5176;&#x4E2D;&#x7684;&#x4E00;&#x4E2A;&#x65B9;&#x9762;&#xFF0C;&#x56E0;&#x4E3A;&#x6D41;&#x590D;&#x5236;&#x662F;&#x57FA;&#x4E8E;&#x5B83;&#x7684; - &#x4E3B;&#x8282;&#x70B9;&#x5728;&#x53D1;&#x751F;WAL&#x6570;&#x636E;&#x5199;&#x5165;&#x65F6;&#x5C06;WAL&#x6570;&#x636E;&#x53D1;&#x9001;&#x5230;&#x6240;&#x8FDE;&#x63A5;&#x7684;&#x5907;&#x8282;&#x70B9;&#x3002; &#x540C;&#x6B65;&#x590D;&#x5236;&#x9700;&#x8981;&#x6570;&#x636E;&#x5E93;&#x540C;&#x6B65; - &#x4E3B;&#x8282;&#x70B9;&#x4E0E;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;&#x901A;&#x4FE1;&#x4EE5;&#x540C;&#x6B65;&#x5176;&#x6570;&#x636E;&#x5E93;&#x7FA4;&#x96C6;&#x3002;</p>
 <p>&#x8981;&#x51C6;&#x786E;&#x4E86;&#x89E3;&#x6D41;&#x590D;&#x5236;&#x7684;&#x5DE5;&#x4F5C;&#x539F;&#x7406;&#xFF0C;&#x6211;&#x4EEC;&#x5E94;&#x8BE5;&#x63A2;&#x7D22;&#x4E00;&#x4E2A;&#x4E3B;&#x8282;&#x70B9;&#x5982;&#x4F55;&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;&#x3002; &#x4E3A;&#x4E86;&#x7B80;&#x5355;&#x8D77;&#x89C1;&#xFF0C;&#x672C;&#x8282;&#x63CF;&#x8FF0;&#x4E86;&#x7279;&#x6B8A;&#x60C5;&#x51B5;(&#x5373;&#x4E00;&#x4E3B;&#x4E00;&#x5907;)&#xFF0C;&#x800C;&#x4E0B;&#x4E00;&#x8282;&#x5C06;&#x63CF;&#x8FF0;&#x4E00;&#x822C;&#x60C5;&#x51B5;(&#x4E00;&#x4E3B;&#x591A;&#x5907;)&#x3002;</p>
-<h3 id="1121-&#x4E3B;&#x8282;&#x70B9;&#x548C;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x4E4B;&#x95F4;&#x7684;&#x901A;&#x4FE1;">11.2.1. &#x4E3B;&#x8282;&#x70B9;&#x548C;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x4E4B;&#x95F4;&#x7684;&#x901A;&#x4FE1;</h3>
+<h3 id="1121-&#x4E3B;&#x8282;&#x70B9;&#x548C;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x4E4B;&#x95F4;&#x7684;&#x901A;&#x4FE1;"><a name="1121-&#x4E3B;&#x8282;&#x70B9;&#x548C;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x4E4B;&#x95F4;&#x7684;&#x901A;&#x4FE1;" class="anchor-navigation-ex-anchor" href="#1121-&#x4E3B;&#x8282;&#x70B9;&#x548C;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x4E4B;&#x95F4;&#x7684;&#x901A;&#x4FE1;"><i class="fa fa-link" aria-hidden="true"></i></a><a name="1121-&#x4E3B;&#x8282;&#x70B9;&#x548C;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x4E4B;&#x95F4;&#x7684;&#x901A;&#x4FE1;" class="plugin-anchor" href="#1121-&#x4E3B;&#x8282;&#x70B9;&#x548C;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x4E4B;&#x95F4;&#x7684;&#x901A;&#x4FE1;"><i class="fa fa-link" aria-hidden="true"></i></a>11.2.1. &#x4E3B;&#x8282;&#x70B9;&#x548C;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x4E4B;&#x95F4;&#x7684;&#x901A;&#x4FE1;</h3>
 <p>&#x5047;&#x8BBE;&#x5907;&#x8282;&#x70B9;&#x5904;&#x4E8E;&#x540C;&#x6B65;&#x590D;&#x5236;&#x6A21;&#x5F0F;&#xFF0C;&#x4F46;&#x914D;&#x7F6E;&#x53C2;&#x6570;<em>hot-standby</em>&#x88AB;&#x7981;&#x7528;&#xFF0C;&#x5E76;&#x4E14;wal_level&#x4E3A;&apos;archive&apos;&#x3002; &#x4E3B;&#x8282;&#x70B9;&#x7684;&#x4E3B;&#x8981;&#x53C2;&#x6570;&#x5982;&#x4E0B;&#x6240;&#x793A;&#xFF1A;</p>
 <pre><code class="lang-shell">synchronous_standby_names = &apos;standby1&apos;
 hot_standby = off
@@ -369,7 +412,7 @@ wal_level = archive
 <p>(6) startup&#x8FDB;&#x7A0B;&#x91CD;&#x653E;&#x5DF2;&#x5199;&#x5165;WAL&#x6BB5;&#x7684;WAL&#x6570;&#x636E;&#x3002;</p>
 <p>(7) walsender&#x5728;&#x63A5;&#x6536;&#x5230;&#x6765;&#x81EA;walreceiver&#x7684;ACK&#x54CD;&#x5E94;&#x540E;&#x91CA;&#x653E;&#x540E;&#x7AEF;&#x8FDB;&#x7A0B;&#x7684;&#x9501;&#xFF0C;&#x7136;&#x540E;&#xFF0C;&#x540E;&#x7AEF;&#x8FDB;&#x7A0B;&#x7684;&#x63D0;&#x4EA4;&#x6216;&#x4E2D;&#x6B62;&#x64CD;&#x4F5C;&#x5C06;&#x5B8C;&#x6210;&#x3002;&#x9501;&#x91CA;&#x653E;&#x7684;&#x65F6;&#x95F4;&#x53D6;&#x51B3;&#x4E8E;&#x53C2;&#x6570;synchronous_commit&#x3002;&#x5B83;&#x662F;&apos;on&apos;(&#x9ED8;&#x8BA4;)&#xFF0C;&#x5F53;&#x63A5;&#x6536;&#x5230;&#x6B65;&#x9AA4;(5)&#x7684;ACK&#x65F6;&#x91CA;&#x653E;&#x9501;&#xFF0C;&#x800C;&#x5F53;&#x63A5;&#x6536;&#x5230;&#x6B65;&#x9AA4;(4)&#x7684;ACK&#x65F6;&#xFF0C;&#x5B83;&#x662F;&apos;remote_write&apos;&#x3002;</p>
 <blockquote>
-<p>:pushpin: &#x5982;&#x679C;&#x914D;&#x7F6E;&#x53C2;&#x6570;wal_level&#x4E3A;&apos;hot_standby&apos;&#x6216;&apos;logical&apos;&#xFF0C;&#x5219;PostgreSQL&#x5728;&#x63D0;&#x4EA4;&#x6216;&#x4E2D;&#x6B62;&#x64CD;&#x4F5C;&#x7684;&#x8BB0;&#x5F55;&#x4E4B;&#x540E;&#x5199;&#x5165;&#x5173;&#x4E8E;&#x70ED;&#x5907;&#x7684;WAL&#x8BB0;&#x5F55;&#x3002; (&#x5728;&#x8FD9;&#x4E2A;&#x4F8B;&#x5B50;&#x4E2D;&#xFF0C;PostgreSQL&#x4E0D;&#x4F1A;&#x5199;&#x8FD9;&#x4E2A;&#x8BB0;&#x5F55;&#xFF0C;&#x56E0;&#x4E3A;&#x5B83;&#x662F;&apos;archive&apos;&#x3002;)</p>
+<p><img align="absmiddle" alt=":pushpin:" class="emoji" src="gitbook/gitbook-plugin-advanced-emoji/emojis/pushpin.png" title=":pushpin:"> &#x5982;&#x679C;&#x914D;&#x7F6E;&#x53C2;&#x6570;wal_level&#x4E3A;&apos;hot_standby&apos;&#x6216;&apos;logical&apos;&#xFF0C;&#x5219;PostgreSQL&#x5728;&#x63D0;&#x4EA4;&#x6216;&#x4E2D;&#x6B62;&#x64CD;&#x4F5C;&#x7684;&#x8BB0;&#x5F55;&#x4E4B;&#x540E;&#x5199;&#x5165;&#x5173;&#x4E8E;&#x70ED;&#x5907;&#x7684;WAL&#x8BB0;&#x5F55;&#x3002; (&#x5728;&#x8FD9;&#x4E2A;&#x4F8B;&#x5B50;&#x4E2D;&#xFF0C;PostgreSQL&#x4E0D;&#x4F1A;&#x5199;&#x8FD9;&#x4E2A;&#x8BB0;&#x5F55;&#xFF0C;&#x56E0;&#x4E3A;&#x5B83;&#x662F;&apos;archive&apos;&#x3002;)</p>
 </blockquote>
 <p>&#x6BCF;&#x4E2A;ACK&#x54CD;&#x5E94;&#x5C06;&#x5907;&#x8282;&#x70B9;&#x7684;&#x5185;&#x90E8;&#x4FE1;&#x606F;&#x901A;&#x77E5;&#x4E3B;&#x8282;&#x70B9;&#x3002; &#x5B83;&#x5305;&#x542B;&#x4EE5;&#x4E0B;&#x56DB;&#x4E2A;&#x9879;&#x76EE;&#xFF1A;</p>
 <ul>
@@ -391,9 +434,9 @@ wal_level = archive
 (2 rows)
 </code></pre>
 <blockquote>
-<p>:pushpin: &#x5468;&#x671F;&#x6027;&#x68C0;&#x67E5;&#x7684;&#x65F6;&#x95F4;&#x95F4;&#x9694;&#x7531;&#x53C2;&#x6570;wal_receiver_status_interval&#x8BBE;&#x7F6E;&#xFF0C;&#x9ED8;&#x8BA4;&#x4E3A;10&#x79D2;&#x3002;</p>
+<p><img align="absmiddle" alt=":pushpin:" class="emoji" src="gitbook/gitbook-plugin-advanced-emoji/emojis/pushpin.png" title=":pushpin:"> &#x5468;&#x671F;&#x6027;&#x68C0;&#x67E5;&#x7684;&#x65F6;&#x95F4;&#x95F4;&#x9694;&#x7531;&#x53C2;&#x6570;wal_receiver_status_interval&#x8BBE;&#x7F6E;&#xFF0C;&#x9ED8;&#x8BA4;&#x4E3A;10&#x79D2;&#x3002;</p>
 </blockquote>
-<h3 id="1122-&#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;">11.2.2. &#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;</h3>
+<h3 id="1122-&#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;"><a name="1122-&#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;" class="anchor-navigation-ex-anchor" href="#1122-&#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;"><i class="fa fa-link" aria-hidden="true"></i></a><a name="1122-&#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;" class="plugin-anchor" href="#1122-&#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;"><i class="fa fa-link" aria-hidden="true"></i></a>11.2.2. &#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;</h3>
 <p>&#x5728;&#x672C;&#x5C0F;&#x8282;&#x4E2D;&#xFF0C;&#x5C06;&#x4ECB;&#x7ECD;&#x4E3B;&#x8282;&#x70B9;&#x5728;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x51FA;&#x73B0;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;&#x4EE5;&#x53CA;&#x5982;&#x4F55;&#x5904;&#x7406;&#x8FD9;&#x79CD;&#x60C5;&#x51B5;&#x3002;</p>
 <p>&#x5373;&#x4F7F;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x53D1;&#x751F;&#x6545;&#x969C;&#x5E76;&#x4E14;&#x4E0D;&#x518D;&#x80FD;&#x591F;&#x8FD4;&#x56DE;ACK&#x54CD;&#x5E94;&#xFF0C;&#x4E3B;&#x8282;&#x70B9;&#x4E5F;&#x4F1A;&#x4E00;&#x76F4;&#x7B49;&#x5F85;&#x54CD;&#x5E94;&#x3002; &#x56E0;&#x6B64;&#xFF0C;&#x6B63;&#x5728;&#x8FD0;&#x884C;&#x7684;&#x4E8B;&#x52A1;&#x4E0D;&#x80FD;&#x63D0;&#x4EA4;&#xFF0C;&#x5E76;&#x4E14;&#x540E;&#x7EED;&#x7684;&#x67E5;&#x8BE2;&#x5904;&#x7406;&#x65E0;&#x6CD5;&#x542F;&#x52A8;&#x3002; &#x6362;&#x53E5;&#x8BDD;&#x8BF4;&#xFF0C;&#x6240;&#x6709;&#x7684;&#x4E3B;&#x8282;&#x70B9;&#x64CD;&#x4F5C;&#x5B9E;&#x9645;&#x4E0A;&#x90FD;&#x505C;&#x6B62;&#x4E86;&#x3002; (&#x6D41;&#x590D;&#x5236;&#x4E0D;&#x652F;&#x6301;&#x901A;&#x8FC7;&#x8D85;&#x65F6;&#x81EA;&#x52A8;&#x6062;&#x590D;&#x4E3A;&#x5F02;&#x6B65;&#x6A21;&#x5F0F;&#x7684;&#x529F;&#x80FD;&#x3002;)</p>
 <p>&#x6709;&#x4E24;&#x79CD;&#x65B9;&#x6CD5;&#x53EF;&#x4EE5;&#x907F;&#x514D;&#x8FD9;&#x79CD;&#x60C5;&#x51B5;&#x3002; &#x5176;&#x4E2D;&#x4E4B;&#x4E00;&#x662F;&#x4F7F;&#x7528;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;&#x6765;&#x63D0;&#x9AD8;&#x7CFB;&#x7EDF;&#x53EF;&#x7528;&#x6027;&#xFF0C;&#x53E6;&#x4E00;&#x4E2A;&#x662F;&#x901A;&#x8FC7;&#x624B;&#x52A8;&#x6267;&#x884C;&#x4EE5;&#x4E0B;&#x6B65;&#x9AA4;&#x4ECE;&#x540C;&#x6B65;&#x6A21;&#x5F0F;&#x5207;&#x6362;&#x5230;&#x5F02;&#x6B65;&#x6A21;&#x5F0F;&#x3002;</p>
@@ -404,9 +447,9 @@ wal_level = archive
 <pre><code class="lang-shell">  postgres&gt; pg_ctl -D $PGDATA reload
 </code></pre>
 <p>&#x4E0A;&#x8FF0;&#x8FC7;&#x7A0B;&#x4E0D;&#x4F1A;&#x5F71;&#x54CD;&#x8FDE;&#x63A5;&#x7684;&#x5BA2;&#x6237;&#x7AEF;&#x3002; &#x4E3B;&#x8282;&#x70B9;&#x7EE7;&#x7EED;&#x4E8B;&#x52A1;&#x5904;&#x7406;&#x4EE5;&#x53CA;&#x5BA2;&#x6237;&#x7AEF;&#x548C;&#x76F8;&#x5E94;&#x540E;&#x7AEF;&#x8FDB;&#x7A0B;&#x4E4B;&#x95F4;&#x7684;&#x6240;&#x6709;&#x4F1A;&#x8BDD;&#x90FD;&#x4F1A;&#x4FDD;&#x7559;&#x3002;</p>
-<h2 id="113-&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;">11.3. &#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;</h2>
+<h2 id="113-&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;"><a name="113-&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;" class="anchor-navigation-ex-anchor" href="#113-&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;"><i class="fa fa-link" aria-hidden="true"></i></a><a name="113-&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;" class="plugin-anchor" href="#113-&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;"><i class="fa fa-link" aria-hidden="true"></i></a>11.3. &#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;</h2>
 <p>&#x5728;&#x672C;&#x8282;&#x4E2D;&#xFF0C;&#x5C06;&#x63CF;&#x8FF0;&#x6D41;&#x590D;&#x5236;&#x4E0E;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;&#x4E00;&#x8D77;&#x4F7F;&#x7528;&#x7684;&#x65B9;&#x5F0F;&#x3002;</p>
-<h3 id="1131-syncpriority-&#x548C;-syncstate">11.3.1. sync_priority &#x548C; sync_state</h3>
+<h3 id="1131-syncpriority-&#x548C;-syncstate"><a name="1131-syncpriority-&#x548C;-syncstate" class="anchor-navigation-ex-anchor" href="#1131-syncpriority-&#x548C;-syncstate"><i class="fa fa-link" aria-hidden="true"></i></a><a name="1131-syncpriority-&#x548C;-syncstate" class="plugin-anchor" href="#1131-syncpriority-&#x548C;-syncstate"><i class="fa fa-link" aria-hidden="true"></i></a>11.3.1. sync_priority &#x548C; sync_state</h3>
 <p>&#x4E3B;&#x8282;&#x70B9;&#x4E3A;&#x6240;&#x6709;&#x5907;&#x8282;&#x70B9;&#x63D0;&#x4F9B;sync_priority&#x548C;sync_state&#xFF0C;&#x5E76;&#x6839;&#x636E;&#x5404;&#x81EA;&#x7684;&#x503C;&#x5904;&#x7406;&#x6BCF;&#x4E2A;&#x5907;&#x8282;&#x70B9;&#x3002; (&#x5373;&#x4F7F;&#x4E3B;&#x8282;&#x70B9;&#x53EA;&#x7BA1;&#x7406;&#x4E00;&#x4E2A;&#x5907;&#x8282;&#x70B9;&#xFF0C;&#x4E3B;&#x8282;&#x70B9;&#x4E5F;&#x4F1A;&#x63D0;&#x4F9B;&#x8FD9;&#x4E9B;&#x503C;;&#x4E0A;&#x4E00;&#x8282;&#x4E2D;&#x672A;&#x63D0;&#x53CA;&#x8FD9;&#x4E00;&#x70B9;&#x3002;)</p>
 <p>sync_priority&#x8868;&#x793A;&#x5907;&#x8282;&#x70B9;&#x5728;&#x540C;&#x6B65;&#x6A21;&#x5F0F;&#x4E0B;&#x7684;&#x4F18;&#x5148;&#x7EA7;&#xFF0C;&#x5E76;&#x4E14;&#x662F;&#x4E00;&#x4E2A;&#x56FA;&#x5B9A;&#x503C;&#x3002; &#x8F83;&#x5C0F;&#x7684;&#x503C;&#x8868;&#x793A;&#x8F83;&#x9AD8;&#x7684;&#x4F18;&#x5148;&#x7EA7;&#xFF0C;&#x800C;0&#x8868;&#x793A;&#x201C;&#x5728;&#x5F02;&#x6B65;&#x6A21;&#x5F0F;&#x4E0B;&#x201D;&#x7684;&#x7279;&#x6B8A;&#x503C;&#x3002; &#x5907;&#x8282;&#x70B9;&#x7684;&#x4F18;&#x5148;&#x7EA7;&#x6309;&#x7167;&#x4E3B;&#x914D;&#x7F6E;&#x53C2;&#x6570;synchronous_standby_names&#x4E2D;&#x5217;&#x51FA;&#x7684;&#x987A;&#x5E8F;&#x7ED9;&#x51FA;&#x3002; &#x4F8B;&#x5982;&#xFF0C;&#x5728;&#x4EE5;&#x4E0B;&#x914D;&#x7F6E;&#x4E2D;&#xFF0C;standby1&#x548C;standby2&#x7684;&#x4F18;&#x5148;&#x7EA7;&#x5206;&#x522B;&#x4E3A;1&#x548C;2&#x3002;</p>
 <pre><code class="lang-shell">synchronous_standby_names = &apos;standby1, standby2&apos;
@@ -428,7 +471,7 @@ wal_level = archive
 (2 rows)
 </code></pre>
 <blockquote>
-<p>:pushpin: &#x6700;&#x8FD1;&#x6709;&#x51E0;&#x4F4D;&#x5F00;&#x53D1;&#x4EBA;&#x5458;&#x8BD5;&#x56FE;&#x5B9E;&#x73B0;&apos;&#x591A;&#x4E2A;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&apos;&#x3002; &#x8BE6;&#x60C5;&#x8BF7;&#x770B;<a href="https://commitfest.postgresql.org/6/293/" target="_blank">&#x8FD9;&#x91CC;</a>&#x3002;</p>
+<p><img align="absmiddle" alt=":pushpin:" class="emoji" src="gitbook/gitbook-plugin-advanced-emoji/emojis/pushpin.png" title=":pushpin:"> &#x6700;&#x8FD1;&#x6709;&#x51E0;&#x4F4D;&#x5F00;&#x53D1;&#x4EBA;&#x5458;&#x8BD5;&#x56FE;&#x5B9E;&#x73B0;&apos;&#x591A;&#x4E2A;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&apos;&#x3002; &#x8BE6;&#x60C5;&#x8BF7;&#x770B;<a href="https://commitfest.postgresql.org/6/293/" target="_blank">&#x8FD9;&#x91CC;</a>&#x3002;</p>
 <p>10&#x7248;&#x672C;&#x5DF2;&#x7ECF;&#x5B9E;&#x73B0;&#xFF0C;&#x57FA;&#x4E8E;Quorum&#x540C;&#x6B65;&#x6D41;&#x590D;&#x5236;&#x3002;</p>
 <pre><code class="lang-sql"><span class="hljs-keyword">select</span> application_name,pid,state,client_addr,sync_priority,sync_state <span class="hljs-keyword">from</span> pg_stat_replication;
  application_name |  pid  |   state   |  client_addr   | sync_priority | sync_state 
@@ -440,7 +483,7 @@ wal_level = archive
 (4 rows)
 </code></pre>
 </blockquote>
-<h3 id="1132-&#x5982;&#x4F55;&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;">11.3.2. &#x5982;&#x4F55;&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;</h3>
+<h3 id="1132-&#x5982;&#x4F55;&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;"><a name="1132-&#x5982;&#x4F55;&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;" class="anchor-navigation-ex-anchor" href="#1132-&#x5982;&#x4F55;&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;"><i class="fa fa-link" aria-hidden="true"></i></a><a name="1132-&#x5982;&#x4F55;&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;" class="plugin-anchor" href="#1132-&#x5982;&#x4F55;&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;"><i class="fa fa-link" aria-hidden="true"></i></a>11.3.2. &#x5982;&#x4F55;&#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;</h3>
 <p>&#x4E3B;&#x8282;&#x70B9;&#x5355;&#x72EC;&#x7B49;&#x5F85;&#x6765;&#x81EA;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x7684;ACK&#x54CD;&#x5E94;&#x3002; &#x6362;&#x53E5;&#x8BDD;&#x8BF4;&#xFF0C;&#x4E3B;&#x8282;&#x70B9;&#x53EA;&#x786E;&#x8BA4;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x6570;&#x636E;&#x7684;&#x5199;&#x5165;&#x548C;&#x5237;&#x65B0;&#x3002; &#x56E0;&#x6B64;&#xFF0C;&#x6D41;&#x590D;&#x5236;&#x786E;&#x4FDD;&#x53EA;&#x6709;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x4E0E;&#x4E3B;&#x8282;&#x70B9;&#x5904;&#x4E8E;&#x4E00;&#x81F4;&#x4E14;&#x540C;&#x6B65;&#x72B6;&#x6001;&#x3002;</p>
 <p>&#x56FE;11.3&#x663E;&#x793A;&#x4E86;&#x6F5C;&#x5728;&#x5907;&#x8282;&#x70B9;&#x7684;ACK&#x54CD;&#x5E94;&#x65E9;&#x4E8E;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x7684;&#x54CD;&#x5E94;&#x8FD4;&#x56DE;&#x7684;&#x60C5;&#x51B5;&#x3002; &#x5728;&#x8FD9;&#x91CC;&#xFF0C;&#x4E3B;&#x8282;&#x70B9;&#x4E0D;&#x4F1A;&#x5B8C;&#x6210;&#x5F53;&#x524D;&#x4E8B;&#x52A1;&#x7684;&#x63D0;&#x4EA4;&#x64CD;&#x4F5C;&#xFF0C;&#x5E76;&#x7EE7;&#x7EED;&#x7B49;&#x5F85;&#x4E3B;&#x8282;&#x70B9;&#x7684;ACK&#x54CD;&#x5E94;&#x3002; &#x7136;&#x540E;&#xFF0C;&#x5F53;&#x6536;&#x5230;&#x4E3B;&#x8282;&#x70B9;&#x7684;&#x54CD;&#x5E94;&#x65F6;&#xFF0C;&#x540E;&#x7AEF;&#x8FDB;&#x7A0B;&#x91CA;&#x653E;&#x9501;&#x5E76;&#x5B8C;&#x6210;&#x5F53;&#x524D;&#x7684;&#x4E8B;&#x52A1;&#x5904;&#x7406;&#x3002;</p>
 <p><strong>&#x56FE;. 11.3. &#x7BA1;&#x7406;&#x591A;&#x4E2A;&#x5907;&#x8282;&#x70B9;</strong></p>
@@ -450,14 +493,14 @@ wal_level = archive
 <p>standby1&#x548C;standby2&#x7684;sync_state&#x5206;&#x522B;&#x662F;&apos;sync&apos;&#x548C;&apos;potential&apos;&#x3002; (1)&#x5C3D;&#x7BA1;&#x63A5;&#x6536;&#x5230;&#x6F5C;&#x5728;&#x5907;&#x8282;&#x70B9;&#x7684;ACK&#x54CD;&#x5E94;&#xFF0C;&#x4E3B;&#x8282;&#x70B9;&#x7684;&#x540E;&#x7AEF;&#x8FDB;&#x7A0B;&#x4ECD;&#x7EE7;&#x7EED;&#x7B49;&#x5F85;&#x6765;&#x81EA;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x7684;ACK&#x54CD;&#x5E94;&#x3002; (2)&#x4E3B;&#x8282;&#x70B9;&#x7684;&#x540E;&#x7AEF;&#x8FDB;&#x7A0B;&#x91CA;&#x653E;&#x9501;&#xFF0C;&#x5B8C;&#x6210;&#x5F53;&#x524D;&#x7684;&#x4E8B;&#x52A1;&#x5904;&#x7406;&#x3002;</p>
 </blockquote>
 <p>&#x5728;&#x76F8;&#x53CD;&#x7684;&#x60C5;&#x51B5;&#x4E0B;(&#x5373;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;ACK&#x54CD;&#x5E94;&#x65E9;&#x4E8E;&#x6F5C;&#x5728;&#x5907;&#x8282;&#x70B9;&#x7684;&#x54CD;&#x5E94;&#x8FD4;&#x56DE;)&#xFF0C;&#x4E3B;&#x8282;&#x70B9;&#x7ACB;&#x5373;&#x5B8C;&#x6210;&#x5F53;&#x524D;&#x4E8B;&#x52A1;&#x7684;&#x63D0;&#x4EA4;&#x64CD;&#x4F5C;&#xFF0C;&#x800C;&#x4E0D;&#x786E;&#x4FDD;&#x6F5C;&#x5728;&#x7684;&#x5907;&#x8282;&#x70B9;&#x662F;&#x5426;&#x5199;&#x5165;&#x548C;&#x5237;&#x65B0;WAL&#x6570;&#x636E;&#x3002;</p>
-<h3 id="1133-&#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;">11.3.3. &#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;</h3>
+<h3 id="1133-&#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;"><a name="1133-&#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;" class="anchor-navigation-ex-anchor" href="#1133-&#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;"><i class="fa fa-link" aria-hidden="true"></i></a><a name="1133-&#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;" class="plugin-anchor" href="#1133-&#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;"><i class="fa fa-link" aria-hidden="true"></i></a>11.3.3. &#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;</h3>
 <p>&#x518D;&#x6B21;&#x67E5;&#x770B;&#x4E3B;&#x8282;&#x70B9;&#x5728;&#x5907;&#x8282;&#x70B9;&#x51FA;&#x73B0;&#x6545;&#x969C;&#x65F6;&#x7684;&#x884C;&#x4E3A;&#x3002;</p>
 <p>&#x5F53;&#x6F5C;&#x5728;&#x6216;&#x5F02;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#xFF0C;&#x4E3B;&#x8282;&#x70B9;&#x5C06;&#x7EC8;&#x6B62;&#x8FDE;&#x63A5;&#x5230;&#x53D1;&#x751F;&#x6545;&#x969C;&#x7684;&#x5907;&#x8282;&#x70B9;&#x7684;walsender&#x8FDB;&#x7A0B;&#xFF0C;&#x5E76;&#x7EE7;&#x7EED;&#x8FDB;&#x884C;&#x6240;&#x6709;&#x5904;&#x7406;&#x3002; &#x6362;&#x53E5;&#x8BDD;&#x8BF4;&#xFF0C;&#x4E3B;&#x8282;&#x70B9;&#x7684;&#x4E8B;&#x52A1;&#x5904;&#x7406;&#x4E0D;&#x4F1A;&#x53D7;&#x5230;&#x4EFB;&#x4F55;&#x4E00;&#x79CD;&#x5907;&#x8282;&#x70B9;&#x7684;&#x6545;&#x969C;&#x7684;&#x5F71;&#x54CD;&#x3002;</p>
 <p>&#x5F53;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x53D1;&#x751F;&#x6545;&#x969C;&#x65F6;&#xFF0C;&#x4E3B;&#x8282;&#x70B9;&#x4F1A;&#x7EC8;&#x6B62;&#x8FDE;&#x63A5;&#x5230;&#x53D1;&#x751F;&#x6545;&#x969C;&#x7684;&#x5907;&#x8282;&#x70B9;&#x7684;walsender&#x8FDB;&#x7A0B;&#xFF0C;&#x5E76;&#x7528;&#x6700;&#x9AD8;&#x4F18;&#x5148;&#x7EA7;&#x7684;&#x6F5C;&#x5728;&#x5907;&#x8282;&#x70B9;&#x66FF;&#x6362;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x3002; &#x89C1;&#x56FE;11.4&#x3002; &#x4E0E;&#x4E0A;&#x8FF0;&#x6545;&#x969C;&#x76F8;&#x53CD;&#xFF0C;&#x4E3B;&#x8282;&#x70B9;&#x4E0A;&#x7684;&#x67E5;&#x8BE2;&#x5904;&#x7406;&#x5C06;&#x4ECE;&#x6545;&#x969C;&#x70B9;&#x6682;&#x505C;&#x76F4;&#x5230;&#x66F4;&#x6362;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x3002; (&#x56E0;&#x6B64;&#xFF0C;&#x5907;&#x8282;&#x70B9;&#x7684;&#x6545;&#x969C;&#x68C0;&#x6D4B;&#x5BF9;&#x4E8E;&#x589E;&#x52A0;&#x590D;&#x5236;&#x7CFB;&#x7EDF;&#x7684;&#x53EF;&#x7528;&#x6027;&#x975E;&#x5E38;&#x91CD;&#x8981;&#xFF0C;&#x6545;&#x969C;&#x68C0;&#x6D4B;&#x5C06;&#x5728;&#x4E0B;&#x4E00;&#x8282;&#x4E2D;&#x4ECB;&#x7ECD;&#x3002;)</p>
 <p><strong>&#x56FE;. 11.4. &#x66F4;&#x6362;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;</strong></p>
 <p><img src="https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch11/fig-11-04.png?raw=true" alt="Fig. 11.4. Replacing of synchronous standby server."></p>
 <p>&#x5728;&#x4EFB;&#x4F55;&#x60C5;&#x51B5;&#x4E0B;&#xFF0C;&#x5982;&#x679C;&#x4E00;&#x53F0;&#x6216;&#x591A;&#x53F0;&#x5907;&#x8282;&#x70B9;&#x4EE5;&#x540C;&#x6B65;&#x6A21;&#x5F0F;&#x8FD0;&#x884C;&#xFF0C;&#x4E3B;&#x8282;&#x70B9;&#x59CB;&#x7EC8;&#x53EA;&#x4FDD;&#x7559;&#x4E00;&#x53F0;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#xFF0C;&#x5E76;&#x4E14;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x59CB;&#x7EC8;&#x4E0E;&#x4E3B;&#x8282;&#x70B9;&#x4FDD;&#x6301;&#x4E00;&#x81F4;&#x4E14;&#x540C;&#x6B65;&#x7684;&#x72B6;&#x6001;&#x3002;</p>
-<h2 id="114-&#x68C0;&#x6D4B;&#x5907;&#x8282;&#x70B9;&#x6545;&#x969C;">11.4. &#x68C0;&#x6D4B;&#x5907;&#x8282;&#x70B9;&#x6545;&#x969C;</h2>
+<h2 id="114-&#x68C0;&#x6D4B;&#x5907;&#x8282;&#x70B9;&#x6545;&#x969C;"><a name="114-&#x68C0;&#x6D4B;&#x5907;&#x8282;&#x70B9;&#x6545;&#x969C;" class="anchor-navigation-ex-anchor" href="#114-&#x68C0;&#x6D4B;&#x5907;&#x8282;&#x70B9;&#x6545;&#x969C;"><i class="fa fa-link" aria-hidden="true"></i></a><a name="114-&#x68C0;&#x6D4B;&#x5907;&#x8282;&#x70B9;&#x6545;&#x969C;" class="plugin-anchor" href="#114-&#x68C0;&#x6D4B;&#x5907;&#x8282;&#x70B9;&#x6545;&#x969C;"><i class="fa fa-link" aria-hidden="true"></i></a>11.4. &#x68C0;&#x6D4B;&#x5907;&#x8282;&#x70B9;&#x6545;&#x969C;</h2>
 <p>&#x6D41;&#x590D;&#x5236;&#x4F7F;&#x7528;&#x4E24;&#x79CD;&#x5E38;&#x89C1;&#x7684;&#x6545;&#x969C;&#x68C0;&#x6D4B;&#x7A0B;&#x5E8F;&#xFF0C;&#x6839;&#x672C;&#x4E0D;&#x9700;&#x8981;&#x4EFB;&#x4F55;&#x7279;&#x6B8A;&#x7684;&#x786C;&#x4EF6;&#x3002;</p>
 <ol>
 <li><p>&#x5907;&#x8282;&#x70B9;&#x8FDB;&#x7A0B;&#x7684;&#x6545;&#x969C;&#x68C0;&#x6D4B;</p>
@@ -469,7 +512,7 @@ wal_level = archive
 </ol>
 <p>&#x6839;&#x636E;&#x6545;&#x969C;&#x7C7B;&#x578B;&#xFF0C;&#x901A;&#x5E38;&#x53EF;&#x4EE5;&#x5728;&#x6545;&#x969C;&#x53D1;&#x751F;&#x540E;&#x7ACB;&#x5373;&#x68C0;&#x6D4B;&#x5230;&#xFF0C;&#x4F46;&#x6709;&#x65F6;&#x5728;&#x6545;&#x969C;&#x53D1;&#x751F;&#x548C;&#x68C0;&#x6D4B;&#x5230;&#x6545;&#x969C;&#x4E4B;&#x95F4;&#x53EF;&#x80FD;&#x5B58;&#x5728;&#x65F6;&#x95F4;&#x5EF6;&#x8FDF;&#x3002;&#x7279;&#x522B;&#x662F;&#xFF0C;&#x5982;&#x679C;&#x5728;&#x540C;&#x6B65;&#x5907;&#x8282;&#x70B9;&#x4E2D;&#x53D1;&#x751F;&#x540E;&#x4E00;&#x7C7B;&#x6545;&#x969C;&#xFF0C;&#x5373;&#x4F7F;&#x591A;&#x4E2A;&#x6F5C;&#x5728;&#x7684;&#x5907;&#x8282;&#x70B9;&#x53EF;&#x80FD;&#x4E00;&#x76F4;&#x5728;&#x5DE5;&#x4F5C;&#xFF0C;&#x5728;&#x4E3B;&#x8282;&#x70B9;&#x4E0A;&#x7684;&#x6240;&#x6709;&#x4E8B;&#x52A1;&#x5904;&#x7406;&#x90FD;&#x5C06;&#x88AB;&#x505C;&#x6B62;&#x76F4;&#x5230;&#x68C0;&#x6D4B;&#x5230;&#x5907;&#x7528;&#x6545;&#x969C;&#x3002;</p>
 <blockquote>
-<p>:pushpin: &#x200B;&#x5728;9.2&#x6216;&#x66F4;&#x65E9;&#x7684;&#x7248;&#x672C;&#x4E2D;&#xFF0C;&#x53C2;&#x6570;wal_sender_timeout&#x88AB;&#x79F0;&#x4E3A;replication_timeout&#x3002;</p>
+<p><img align="absmiddle" alt=":pushpin:" class="emoji" src="gitbook/gitbook-plugin-advanced-emoji/emojis/pushpin.png" title=":pushpin:"> &#x200B;&#x5728;9.2&#x6216;&#x66F4;&#x65E9;&#x7684;&#x7248;&#x672C;&#x4E2D;&#xFF0C;&#x53C2;&#x6570;wal_sender_timeout&#x88AB;&#x79F0;&#x4E3A;replication_timeout&#x3002;</p>
 </blockquote>
 
                                 
@@ -498,10 +541,14 @@ wal_level = archive
 
             
                 
-                <a href="ch10.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: 第十章. 基础备份和时间点恢复 (PITR)">
+                <a href="ch10.html" class="navigation navigation-prev " aria-label="Previous page: 第十章. 基础备份和时间点恢复 (PITR)">
                     <i class="fa fa-angle-left"></i>
                 </a>
                 
+                
+                <a href="ch11.html#112-如何进行流复制" class="navigation navigation-next " aria-label="Next page: 11.2. 如何进行流复制">
+                    <i class="fa fa-angle-right"></i>
+                </a>
                 
             
         
@@ -510,7 +557,7 @@ wal_level = archive
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"第十一章. 流复制","level":"1.13","depth":1,"previous":{"title":"第十章. 基础备份和时间点恢复 (PITR)","level":"1.12","depth":1,"path":"ch10.md","ref":"ch10.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["livereload"],"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"ch11.md","mtime":"2018-06-25T03:32:16.088Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-06-25T09:51:36.515Z"},"basePath":".","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"第十一章. 流复制","level":"1.13","depth":1,"next":{"title":"11.2. 如何进行流复制","level":"1.13.1","depth":2,"anchor":"#112-如何进行流复制","path":"ch11.md","ref":"ch11.md#112-如何进行流复制","articles":[]},"previous":{"title":"第十章. 基础备份和时间点恢复 (PITR)","level":"1.12","depth":1,"path":"ch10.md","ref":"ch10.md","articles":[]},"dir":"ltr"},"config":{"plugins":["anchors","advanced-emoji","github","favicon","anchor-navigation-ex","livereload"],"styles":{"ebook":"styles/ebook.css","epub":"styles/epub.css","mobi":"styles/mobi.css","pdf":"styles/pdf.css","print":"styles/print.css","website":"styles/website.css"},"pluginsConfig":{"github":{"url":"https://github.com/yonj1e/The-Internals-of-PostgreSQL"},"livereload":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"fontsettings":{"theme":"white","family":"sans","size":2},"highlight":{},"anchor-navigation-ex":{"associatedWithSummary":false,"float":{"level1Icon":"","level2Icon":"","level3Icon":"","showLevelIcon":false},"mode":"float","multipleH1":true,"pageTop":{"level1Icon":"fa fa-hand-o-right","level2Icon":"fa fa-hand-o-right","level3Icon":"fa fa-hand-o-right","showLevelIcon":false},"printLog":false,"showLevel":true},"favicon":{"shortcut":"favicon.ico","bookmark":"favicon.ico"},"advanced-emoji":{"embedEmojis":false},"sharing":{"facebook":false,"twitter":false,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":[]},"theme-default":{"showLevel":false,"styles":{"ebook":"styles/ebook.css","epub":"styles/epub.css","mobi":"styles/mobi.css","pdf":"styles/pdf.css","print":"styles/print.css","website":"styles/website.css"}},"anchors":{}},"theme":"default","pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"variables":{},"title":"interdb","language":"zh-hans","links":{"gitbook":false,"sharing":{"google":false,"facebook":false,"twitter":false,"all":false}},"gitbook":"*"},"file":{"path":"ch11.md","mtime":"2018-06-25T03:32:16.088Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2018-06-26T04:05:07.877Z"},"basePath":".","book":{"language":""}});
         });
     </script>
 </div>
@@ -518,6 +565,10 @@ wal_level = archive
         
     <script src="gitbook/gitbook.js"></script>
     <script src="gitbook/theme.js"></script>
+    
+        
+        <script src="gitbook/gitbook-plugin-github/plugin.js"></script>
+        
     
         
         <script src="gitbook/gitbook-plugin-livereload/plugin.js"></script>
