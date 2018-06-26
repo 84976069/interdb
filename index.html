@@ -7,18 +7,21 @@
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css">
-  <link rel="icon" href="/imgs/icon.icon" type="image/x-icon">
-  <link rel="shortcut icon" href="/imgs/icon.icon" type="image/x-icon">
+  <link rel="icon" href="/imgs/logo/icon.icon" type="image/x-icon">
+  <link rel="shortcut icon" href="/imgs/logo/icon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/imgs/logo/icon.ico" type="image/x-icon">
 </head>
 <body>
   <div id="app"></div>
   <script>
     window.$docsify = {
-      name: '',
-      repo: '',
+      name: 'interdb',
+	  nameLink: '/#/ch0',
+      repo: 'https://github.com/yonj1e/The-Internals-of-PostgreSQL',
 	  loadSidebar: true,
       subMaxLevel: 3,
 	  coverpage: true,
+	  auto2top: true,
 	  plugins: [
 		function (hook) {
 		var footer = [

@@ -146,7 +146,8 @@ PostgreSQL中的优化器是基于成本的优化；它不支持基于规则的�
 与其他RDBMS一样，PostgreSQL中的 [EXPLAIN](http://www.postgresql.org/docs/current/static/sql-explain.html) 命令显示计划树。 示例如下所示。
 
 ```sql
-testdb=# EXPLAIN SELECT * FROM tbl_a WHERE id < 300 ORDER BY data;                          					QUERY PLAN                           
+testdb=# EXPLAIN SELECT * FROM tbl_a WHERE id < 300 ORDER BY data;
+						QUERY PLAN                           
 --------------------------------------------------------------- 
 Sort  (cost=182.34..183.09 rows=300 width=8)   
 	Sort Key: data   
