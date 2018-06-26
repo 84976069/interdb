@@ -1,6 +1,6 @@
 # PostgreSQL的内部结构{docsify-ignore-all}  
 
-##### 针对数据库管理员和系统开发人员 
+##### 适用于数据库管理员和系统开发人员 
 
 ![Copyright Diego Zazzeo](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch0/puestas-fauna-mecanica-c.png?raw=true)
 
