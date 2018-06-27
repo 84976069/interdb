@@ -10,4 +10,3 @@
 * for database administrators and system developers
 
 [GitHub](https://github.com//yonj1e/The-Internals-of-PostgreSQL)
-
