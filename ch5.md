@@ -772,22 +772,22 @@ Tx_B(REPEATABLE READ)尝试更新已由Tx_A更新提交的目标行。 在这种
 
 
 
-## 5.9. 可串行化的快照隔离
+## 5.9. serializable快照隔离级别
 
-自9.1版以来，可串行化的快照隔离(Serializable Snapshot Isolation(SSI))已嵌入到SI中，以实现真正的 SERIALIZABLE 隔离级别。 由于SSI的解释并不简单，只介绍大致轮廓。 有关详情，请参见[[2\]](http://www.interdb.jp/pg/pgsql05.html#_5.ref.2)。
+自9.1版以来，serializable快照隔离级别(Serializable Snapshot Isolation(SSI))已嵌入到SI中，以实现真正的 SERIALIZABLE 隔离级别。 由于SSI的解释并不简单，只介绍大致轮廓。 有关详情，请参见[[2\]](http://www.interdb.jp/pg/pgsql05.html#_5.ref.2)。
 
 在下文中，在没有定义情况下使用下面所示的技术术语。 如果您对这些术语不熟悉，请参阅 [[1](http://www.interdb.jp/pg/pgsql05.html#_5.ref.1), [3](http://www.interdb.jp/pg/pgsql05.html#_5.ref.3)]。
 
 - *优先图 precedence graph*(也称为 *依赖图 dependency graph* 和 *串行图 serialization graph*)
-- *序列化异常 serialization anomalies*(例如 *Write-Skew*)
+- *序列化异常 serialization anomalies*(例如 *写倾斜 Write-Skew*)
 
 ### 5.9.1. SSI 基本实现策略
 
-如果在优先图中存在一个由某些冲突产生的循环，则会出现序列化异常。 这是用最简单的异常来解释，即 Write-Skew。
+如果在优先图中存在一个由某些冲突产生的循环，则会出现序列化异常。 这是用最简单的异常来解释，即写倾斜。
 
-图5.12(1)显示了一个时间表。 在这里，Transaction_A读Tuple_B，而Transaction_B读Tuple_A。 然后，Transaction_A写Tuple_A，Transaction_B写Tuple_B。 在这种情况下，存在两个rw-conflicts，并且它们在此时间表的优先图中形成一个循环，如图5.12(2)所示。 因此，该时间表具有序列化异常，即Write-Skew。
+图5.12(1)显示了一个时间表。 在这里，Transaction_A读Tuple_B，而Transaction_B读Tuple_A。 然后，Transaction_A写Tuple_A，Transaction_B写Tuple_B。 在这种情况下，存在两个rw-conflicts，并且它们在此时间表的优先图中形成一个循环，如图5.12(2)所示。 因此，该时间表具有序列化异常，即写倾斜。
 
-**图. 5.12. Write-Skew 时间表和他的优先图**
+**图. 5.12. 写倾斜时间表和他的优先图**
 
 ![Fig. 5.12. Write-Skew schedule and its precedence graph.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch5/fig-5-12.png?raw=true)
 
@@ -815,7 +815,7 @@ SIREAD锁在内部称为谓词锁，它是一对对象和(虚拟)txids，用于�
 
 每当在SERIALIZABLE模式下执行一个DML命令时，由CheckTargetForConflictsOut函数创建SIREAD锁。 例如，如果txid 100读取给定表的Tuple_1，则创建SIREAD锁{Tuple_1，{100}}。 如果另一个事务，例如 txid 101，读取Tuple_1，SIREAD锁更新为{Tuple_1，{100,101}}。 请注意，当读取索引页时，还会创建SIREAD锁，因为索引页仅在使用 [Index-Only Scans](https://www.postgresql.org/docs/current/static/indexes-index-only-scans.html) 时才读取而不读取表页。
 
-SIREAD锁具有三个级别：tuple, page 和 relation。 如果创建了单个page页内所有元组的SIREAD锁，则它们被聚合为该页的单个SIREAD锁，并且关联元组的所有SIREAD锁被释放(移除)，以减少存储空间。 所有读取的页都是如此。
+SIREAD锁具有三个级别：tuple, page 和 relation。 如果创建了单个page页内所有元组的SIREAD锁，则它们被聚合为该页的单个SIREAD锁，并且关联元组的所有SIREAD锁被释放，以减少存储空间。 所有读取的页都是如此。
 
 为索引创建SIREAD锁时，page页级的SIREAD锁从一开始就创建。 使用顺序扫描时，不管是否存在索引和/或WHERE子句，都会从头开始创建 relation级别的SIREAD锁。 请注意，在某些情况下，此实现可能导致错误地检测到序列化异常。 细节在5.9.4节中描述。
 
