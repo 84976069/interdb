@@ -1,14 +1,14 @@
 ## 第六章 VACUUM{docsify-ignore} 
 
-vacuum处理是一个维护过程，有助于PostgreSQL的持续运行。 它的两个主要任务是 *清理 dead tuples* 和 *冻结(freezing)事务ID*，这两个都在[Section 5.10 节](http://www.interdb.jp/pg/pgsql05.html#_5.10.)中简要提及。
+vacuum处理是一个维护过程，有助于PostgreSQL的持续运行。它的两个主要任务是 *清理 dead tuples* 和 *冻结(freezing)事务ID*，这两个都在[Section 5.10 节](http://www.interdb.jp/pg/pgsql05.html#_5.10.)中简要提及。
 
-为了清理 dead tuple，vacuum提供了两种模式，即 **Concurrent VACUUM** 和 **Full VACUUM**。 Concurrent VACUUM(通常简称为VACUUM)为表文件的每个页清理 dead tuple，其他事务可以在此过程运行时读取表。 相比之下，Full VACUUM 清理 dead tuple 并且整理文件的 live tuple 碎片，而其他事务无法在 Full VACUUM 运行时访问表。
+为了清理 dead tuple，vacuum提供了两种模式，即 **Concurrent VACUUM** 和 **Full VACUUM**。Concurrent VACUUM(通常简称为VACUUM)为表文件的每个页清理 dead tuple，其他事务可以在此过程运行时读取表。相比之下，Full VACUUM 清理 dead tuple 并且整理文件的 live tuple 碎片，而其他事务无法在 Full VACUUM 运行时访问表。
 
-尽管vacuum处理对于PostgreSQL来说至关重要，但与其他功能相比，改进其功能的速度一直很慢。 例如，在版本8.0之前，这个过程必须手动执行(使用psql工具或使用cron进程)。在2005年实现 **autovacuum** 守护进程的自动执行。
+尽管vacuum处理对于PostgreSQL来说至关重要，但与其他功能相比，改进其功能的速度一直很慢。例如，在版本8.0之前，这个过程必须手动执行(使用psql工具或使用cron进程)。在2005年实现 **autovacuum** 守护进程的自动执行。
 
-由于vacuum处理涉及扫描整个表，所以这是一个昂贵的过程。 在8.4版本(2009)中，引入了**可见性映射 Visibility Map (VM)**以提高清理dead tuple的效率。 在9.6版本(2016)中，通过增强VM来改进冻结处理。
+由于vacuum处理涉及扫描整个表，所以这是一个昂贵的过程。在8.4版本(2009)中，引入了**可见性映射 Visibility Map (VM)**以提高清理dead tuple的效率。在9.6版本(2016)中，通过增强VM来改进冻结处理。
 
-6.1节概述了concurrent VACUUM。 接下来的部分将介绍以下内容。
+6.1节概述了concurrent VACUUM。接下来的部分将介绍以下内容。
 
 - Visibility Map
 - Freeze processing
@@ -69,7 +69,7 @@ vacuum处理对指定的表或数据库中的所有表执行以下操作
 
 > (1)从指定的表中获取每个表。
 
-> (2)获取表的ShareUpdateExclusiveLock锁。 该锁允许从其他事务中读取。
+> (2)获取表的ShareUpdateExclusiveLock锁。该锁允许从其他事务中读取。
 
 > (3)扫描所有页以获取所有dead tuple，并在必要时冻结dead tuple。
 
@@ -91,7 +91,7 @@ vacuum处理对指定的表或数据库中的所有表执行以下操作
 
 
 
-这个伪代码有两个部分：每个表的循环和后处理。 内循环可以分为三块。
+这个伪代码有两个部分：每个表的循环和后处理。内循环可以分为三块。
 
 下面概述这三块和后处理。
 
@@ -99,7 +99,7 @@ vacuum处理对指定的表或数据库中的所有表执行以下操作
 
 该块执行冻结处理并删除指向dead tuple的索引元组。
 
-首先，PostgreSQL扫描一个目标表来建立一个dead tuple列表，并尽可能冻结旧的元组。 该列表存储在本地缓存的 [maintenance_work_mem](https://www.postgresql.org/docs/current/static/runtime-config-resource.html#GUC-MAINTENANCE-WORK-MEM) 中。 6.3节描述了冻结处理。
+首先，PostgreSQL扫描一个目标表来建立一个dead tuple列表，并尽可能冻结旧的元组。该列表存储在本地缓存的 [maintenance_work_mem](https://www.postgresql.org/docs/current/static/runtime-config-resource.html#GUC-MAINTENANCE-WORK-MEM) 中。6.3节描述了冻结处理。
 
 扫描后，PostgreSQL通过引用dead tuple列表来删除索引元组。
 
@@ -107,15 +107,15 @@ vacuum处理对指定的表或数据库中的所有表执行以下操作
 
 ### 6.1.2. 第二块
 
-该块清理dead tuple，并逐页更新FSM和VM。 图6.1给出了一个例子：
+该块清理dead tuple，并逐页更新FSM和VM。图6.1给出了一个例子：
 
 **图. 6.1. 清理一个dead tuple**
 
 ![Fig. 6.1. Removing a dead tuple.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch6/fig-6-01.png?raw=true)
 
-假设该表包含三个page页。 我们专注于第0页(即第一页)。 这个页有三个元组。 Tuple_2是一个dead tuple(图6.1(1))。 在这种情况下，PostgreSQL清理Tuple_2并重新排序剩余的元组以整理碎片，然后更新此页面的FSM和VM(图6.1(2))。 PostgreSQL继续这个过程直到最后一页。
+假设该表包含三个page页。我们专注于第0页(即第一页)。这个页有三个元组。Tuple_2是一个dead tuple(图6.1(1))。在这种情况下，PostgreSQL清理Tuple_2并重新排序剩余的元组以整理碎片，然后更新此页面的FSM和VM(图6.1(2))。PostgreSQL继续这个过程直到最后一页。
 
-请注意，不必要的行指针不会被删除，它们将在未来重用。 因为如果删除行指针，则必须更新关联索引的所有索引元组。
+请注意，不必要的行指针不会被删除，它们将在未来重用。因为如果删除行指针，则必须更新关联索引的所有索引元组。
 
 ### 6.1.3. 第三块
 
@@ -137,11 +137,11 @@ vacuum处理对指定的表或数据库中的所有表执行以下操作
 
 vacuum处理成本高昂; 因此，在8.4版本中引入了VM以降低成本。
 
-VM的基本概念很简单。 每个表都有一个单独的可见性映射表，用于保存表中每个页的可见性。 页的可见性决定了每个页是否有dead tuple。 vacuum处理可以跳过一个没有dead tuple的页。
+VM的基本概念很简单。每个表都有一个单独的可见性映射表，用于保存表中每个页的可见性。页的可见性决定了每个页是否有dead tuple。vacuum处理可以跳过一个没有dead tuple的页。
 
-图6.2显示了如何使用VM。 假设表由三页组成，第0页和第2页包含dead tuple，第1页不包含。 该表的VM拥有关于哪些页包含dead tuple的信息。 在这种情况下，vacuum处理通过参考VM的信息跳过第一页。
+图6.2显示了如何使用VM。假设表由三页组成，第0页和第2页包含dead tuple，第1页不包含。该表的VM拥有关于哪些页包含dead tuple的信息。在这种情况下，vacuum处理通过参考VM的信息跳过第一页。
 
-每个VM由一个或多个8 KB页组成，并且该文件使用“vm”后缀存储。 例如，一个表文件的relfilenode为18751，其FSM(18751_fsm)和VM(18751_vm)文件显示在它下面。
+每个VM由一个或多个8 KB页组成，并且该文件使用“vm”后缀存储。例如，一个表文件的relfilenode为18751，其FSM(18751_fsm)和VM(18751_vm)文件显示在它下面。
 
 **图 6.2. VMS使用示例**
 
@@ -157,13 +157,13 @@ $ ls -la base/16384/18751*
 
 ### 6.2.1. VM 的增强
 
-VM在版本9.6中进行了增强，以提高冻结处理的效率。 新的VM显示page页可见性以及关于每个页中的元组是否冻结的信息(见第6.3.3节)。
+VM在版本9.6中进行了增强，以提高冻结处理的效率。新的VM显示page页可见性以及关于每个页中的元组是否冻结的信息(见第6.3.3节)。
 
 ## 6.3. 冻结(Freeze)处理
 
-冻结处理有两种模式，根据特定条件在任一模式下执行。 为了方便，这些模式被称为 **lazy 模式** 和 **eager 模式**。
+冻结处理有两种模式，根据特定条件在任一模式下执行。为了方便，这些模式被称为 **lazy 模式** 和 **eager 模式**。
 
-Concurrent VACUUM在内部通常被称为“lazy vacuum”。 但是，本文定义的 lazy 模式是冻结处理如何执行的模式。
+Concurrent VACUUM在内部通常被称为“lazy vacuum”。但是，本文定义的 lazy 模式是冻结处理如何执行的模式。
 
 
 
@@ -175,11 +175,11 @@ Concurrent VACUUM在内部通常被称为“lazy vacuum”。 但是，本文定
 
 相反，无论page页是否包含dead tuple，eager 模式都会对所有页进行扫描，并且还会更新与冻结处理相关的系统目录，并在可能的情况下删除clog不必要的部分。
 
-6.3.1节和6.3.2节分别描述了这些模式。 第6.3.3节描述了在 eager 模式下改进冻结处理。
+6.3.1节和6.3.2节分别描述了这些模式。第6.3.3节描述了在 eager 模式下改进冻结处理。
 
 ### 6.3.1. Lazy 模式
 
-启动冻结处理时，PostgreSQL计算FreezeLimittxid并冻结t_xmin小于FreezeLimittxid的元组。 
+启动冻结处理时，PostgreSQL计算FreezeLimittxid并冻结t_xmin小于FreezeLimittxid的元组。
 
 freezeLimit txid定义如下：
 
@@ -195,7 +195,7 @@ OldestXminOldestXmin是当前正在运行的事务中最老的txid。例如，�
 
 $0^{th}$ page:
 
-由于所有t_xmin值都小于freezeLimit txid，因此三个元组被冻结。 另外，在这个vacuum过程中，由于Tuple_1是dead tuple，所以被清理。
+由于所有t_xmin值都小于freezeLimit txid，因此三个元组被冻结。另外，在这个vacuum过程中，由于Tuple_1是dead tuple，所以被清理。
 
 $1^{st}$ page:
 
@@ -219,7 +219,7 @@ eager模式弥补了lazy模式的缺陷。它扫描所有页以检查表中的�
 
 在上面的条件中，pg_database.datfrozenxid表示[pg_database](https://www.postgresql.org/docs/current/static/catalog-pg-database.html)系统目录的列，并保存每个数据库的最早的冻结txid。细节在后面描述;因此，我们假设所有pg_database.datfrozenxid的值都是1821(这是刚刚在版本9.5中安装新数据库集群后的初始值).[Vacuum_freeze_table_age](https://www.postgresql.org/docs/current/static/runtime-config-client.html#GUC-VACUUM-FREEZE-TABLE-AGE)是一个配置参数(默认值为150,000,000)。
 
-图6.4给出了一个具体的例子。在Table_1中，Tuple_1和Tuple_7都已被清理。 Tuple_10和Tuple_11已经被插入第二页。当执行VACUUM命令时，当前txid是150,002,000，并且没有其他事务。因此，OldestXmin是150,002,000，freezeLimit txid是100,002,000。在这种情况下，由于'1821 <(150002000-150000000)1821 <(150002000-150000000)'，因此满足上述条件。因此，在eager模式中冻结处理如下执行。
+图6.4给出了一个具体的例子。在Table_1中，Tuple_1和Tuple_7都已被清理。Tuple_10和Tuple_11已经被插入第二页。当执行VACUUM命令时，当前txid是150,002,000，并且没有其他事务。因此，OldestXmin是150,002,000，freezeLimit txid是100,002,000。在这种情况下，由于'1821 <(150002000-150000000)1821 <(150002000-150000000)'，因此满足上述条件。因此，在eager模式中冻结处理如下执行。
 
 (请注意，这是9.5或更早版本的行为;最新行为在6.3.3节中描述)。
 
@@ -233,13 +233,13 @@ $0^{th}$ page:
 
 $1^{st}$ page:
 
-此页中的三个元组已冻结，因为所有t_xmin值都小于freezeLimit txid。 请注意，在lazy模式此页会跳过。
+此页中的三个元组已冻结，因为所有t_xmin值都小于freezeLimit txid。请注意，在lazy模式此页会跳过。
 
 $2^{nd}$ page:
 
-Tuple_10已被冻结。 Tuple_11没有。
+Tuple_10已被冻结。Tuple_11没有。
 
-冻结每个表后，目标表的pg_class.relfrozenxid被更新。 [pg_class](https://www.postgresql.org/docs/current/static/catalog-pg-class.html) 是一个系统目录，每个pg_class.relfrozenxid列保存相应表的最新冻结xid。在这个例子中，Table_1的pg_class.relfrozenxid更新为当前的freezeLimit txid(即100,002,000)，这意味着Table_1中t_xmin小于100,002,000的所有元组都被冻结。
+冻结每个表后，目标表的pg_class.relfrozenxid被更新。[pg_class](https://www.postgresql.org/docs/current/static/catalog-pg-class.html) 是一个系统目录，每个pg_class.relfrozenxid列保存相应表的最新冻结xid。在这个例子中，Table_1的pg_class.relfrozenxid更新为当前的freezeLimit txid(即100,002,000)，这意味着Table_1中t_xmin小于100,002,000的所有元组都被冻结。
 
 在完成vacuum处理之前，必要时更新pg_database.datfrozenxid。每个pg_database.datfrozenxid列在相应的数据库中保存最小pg_class.relfrozenxid。例如，如果只有Table_1在eager模式下被冻结，则此数据库的pg_database.datfrozenxid不会更新，因为其他关系(可从当前数据库中看到的其他表和系统目录)的pg_class.relfrozenxid尚未更改(图6.5(1))。如果当前数据库中的所有关系都以预先模式冻结，则会更新数据库的pg_database.datfrozenxid，因为此数据库的所有关系的pg_class.relfrozenxid已更新为当前的freezeLimit txid(图6.5(2))。
 
@@ -288,17 +288,17 @@ Tuple_10已被冻结。 Tuple_11没有。
 
 > :pushpin: *FREEZE option*
 
-> 具有FREEZE选项的VACUUM命令强制冻结指定表中的所有txid。 这在eager模式下执行; 但是，freezeLimit设置为OldestXmin(不是'OldestXmin - vacuum_freeze_min_age')。 例如，当VACUUM FULL命令由txid 5000执行且没有其他正在运行的事务时，OldesXmin被设置为5000，而小于5000的txids被冻结。
+> 具有FREEZE选项的VACUUM命令强制冻结指定表中的所有txid。这在eager模式下执行; 但是，freezeLimit设置为OldestXmin(不是'OldestXmin - vacuum_freeze_min_age')。例如，当VACUUM FULL命令由txid 5000执行且没有其他正在运行的事务时，OldesXmin被设置为5000，而小于5000的txids被冻结。
 
  
 
 ### 6.3.3. 在Eager模式下改进冻结处理
 
-9.5版本或更早版本中的eager模式效率不高，因为它总是扫描所有页。 例如，在6.3.2节的例子中，即使页中的所有元组都被冻结，也会扫描第0页。
+9.5版本或更早版本中的eager模式效率不高，因为它总是扫描所有页。例如，在6.3.2节的例子中，即使页中的所有元组都被冻结，也会扫描第0页。
 
-为了解决这个问题，VM和冻结处理在9.6版本中得到了改进。 如第6.2.1节所述，新VM具有关于每个页中是否冻结所有元组的信息。 当在eager模式下执行冻结处理时，可以跳过仅包含冻结元组的页面。
+为了解决这个问题，VM和冻结处理在9.6版本中得到了改进。如第6.2.1节所述，新VM具有关于每个页中是否冻结所有元组的信息。当在eager模式下执行冻结处理时，可以跳过仅包含冻结元组的页面。
 
-图6.6给出了一个例子。 当冻结该表时，通过参考VM的信息跳过第0页。 冻结第1页后，由于此页面的所有元组都已冻结，所以更新了相关的VM信息。
+图6.6给出了一个例子。当冻结该表时，通过参考VM的信息跳过第0页。冻结第1页后，由于此页面的所有元组都已冻结，所以更新了相关的VM信息。
 
 **图. 6.6. 以eager模式冻结旧元组(版本9.6或更高版本)**
 
@@ -306,9 +306,9 @@ Tuple_10已被冻结。 Tuple_11没有。
 
 ## 6.4. 清理不需要的Clog文件
 
-5.4节描述的clog存储事务状态。 当pg_database.datfrozenxid更新时，PostgreSQL将尝试清理不必要的clog文件。 请注意，相应的clog页也会被删除。
+5.4节描述的clog存储事务状态。当pg_database.datfrozenxid更新时，PostgreSQL将尝试清理不必要的clog文件。请注意，相应的clog页也会被删除。
 
-图6.7给出了一个例子。 如果最小pg_database.datfrozenxid包含在clog文件'0002'中，则可以清理较旧的文件('0000'和'0001')，因为存储在这些文件中的所有事务可以被视为整个数据库集群中的冻结txid。
+图6.7给出了一个例子。如果最小pg_database.datfrozenxid包含在clog文件'0002'中，则可以清理较旧的文件('0000'和'0001')，因为存储在这些文件中的所有事务可以被视为整个数据库集群中的冻结txid。
 
 **图. 6.7. 清理不必要的clog文件和页**
 
@@ -344,15 +344,15 @@ Tuple_10已被冻结。 Tuple_11没有。
 
 autovacuum守护进程已经使vacuum处理自动化; 因此，PostgreSQL的操作变得非常简单。
 
-autovacuum守护进程定期调用几个autovacuum_worker进程。 默认情况下，它每1分钟唤醒一次(由[autovacuum_naptime](https://www.postgresql.org/docs/current/static/runtime-config-autovacuum.html#GUC-AUTOVACUUM-NAPTIME)定义)，并调用三个worker(由[autovacuum_max_works](https://www.postgresql.org/docs/current/static/runtime-config-autovacuum.html#GUC-AUTOVACUUM-MAX-WORKERS)定义)。
+autovacuum守护进程定期调用几个autovacuum_worker进程。默认情况下，它每1分钟唤醒一次(由[autovacuum_naptime](https://www.postgresql.org/docs/current/static/runtime-config-autovacuum.html#GUC-AUTOVACUUM-NAPTIME)定义)，并调用三个worker(由[autovacuum_max_works](https://www.postgresql.org/docs/current/static/runtime-config-autovacuum.html#GUC-AUTOVACUUM-MAX-WORKERS)定义)。
 
 由autovacuum调用的autovacuum worker对各个表同时执行vacuum处理，而对数据库活动影响最小。
 
 ## 6.6. Full VACUUM
 
-虽然Concurrent VACUUM至关重要，但这还不够。 例如，即使删除了许多dead tuple，它也不能减小表的大小。
+虽然Concurrent VACUUM至关重要，但这还不够。例如，即使删除了许多dead tuple，它也不能减小表的大小。
 
-图6.8给出了一个极端的例子。 假设一个表由三个页组成，每个页包含六个元组。 执行以下DELETE命令以删除元组，并执行VACUUM命令以清理dead tuple：
+图6.8给出了一个极端的例子。假设一个表由三个页组成，每个页包含六个元组。执行以下DELETE命令以删除元组，并执行VACUUM命令以清理dead tuple：
 
 **图. 6.8. VACUUM(concurrent)缺点示例**
 
@@ -363,9 +363,9 @@ testdb=# DELETE FROM tbl WHERE id % 6 != 0;
 testdb=# VACUUM tbl;
 ```
 
-dead tuple被清理; 但是，表大小并未减少。 这既浪费磁盘空间，也会对数据库性能产生负面影响。 例如，在上面的示例中，当读取表中的三个元组时，必须从磁盘加载三个页。
+dead tuple被清理; 但是，表大小并未减少。这既浪费磁盘空间，也会对数据库性能产生负面影响。例如，在上面的示例中，当读取表中的三个元组时，必须从磁盘加载三个页。
 
-为了处理这种情况，PostgreSQL提供了Full VACUUM模式。 图6.9显示了这种模式的概要。
+为了处理这种情况，PostgreSQL提供了Full VACUUM模式。图6.9显示了这种模式的概要。
 
 **图. 6.9. Full VACUUM 模式概述**
 
@@ -373,7 +373,7 @@ dead tuple被清理; 但是，表大小并未减少。 这既浪费磁盘空间�
 
 [1]创建新表：图6.9(1)
 
-当对表执行VACUUM FULL命令时，PostgreSQL首先获取表的AccessExclusiveLock锁并创建一个大小为8 KB的新表文件。 AccessExclusiveLock锁不允许访问。
+当对表执行VACUUM FULL命令时，PostgreSQL首先获取表的AccessExclusiveLock锁并创建一个大小为8 KB的新表文件。AccessExclusiveLock锁不允许访问。
 
 [2]将live tuple复制到新表中：图6.9(2)
 
@@ -416,7 +416,7 @@ Full VACUUM的伪代码如下所示：
 
 > :pushpin: *什么时候做VACUUM FULL？*
 
-> 不幸的是，当执行'VACUUM FULL'时没有最佳时机。 但是，扩展[pg_freespacemap](https://www.postgresql.org/docs/current/static/pgfreespacemap.html)可能会给你很好的建议。
+> 不幸的是，当执行'VACUUM FULL'时没有最佳时机。但是，扩展[pg_freespacemap](https://www.postgresql.org/docs/current/static/pgfreespacemap.html)可能会给你很好的建议。
 
 > 以下查询显示了表的平均空闲空间比例。
 
