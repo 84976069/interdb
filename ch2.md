@@ -10,9 +10,9 @@ PostgreSQL是一个具有多进程体系结构的C/S类型的关系数据库管�
 
 - **postgres服务进程(server process)**是与数据库集群管理相关的所有进程的父进程。
 - 每个**后端进程(backend process)**处理由连接的客户端发出的所有查询和语句。
-- 各种**后台进程(background processes)**执行用于数据库管理的某些特性功能的进程(例如，VACUUM和CHECKPOINT进程)。
-- 在**复制相关进程(replication associated processes)**中，它们执行流复制。详情见[第11章](ch11.md)。
-- 在9.3版本支持的**后台工作进程(background worker process)**中，它可以执行用户执行的任何处理。这里不详细介绍，请参考[官方文档](http://www.postgresql.org/docs/current/static/bgworker.html)。
+- 各种**后台进程(background processes)**，用于数据库管理的某些特性功能的进程(例如，VACUUM和CHECKPOINT进程)。
+- **复制相关进程(replication associated processes)**，它们执行流复制。详情见[第11章](ch11.md)。
+- 在9.3版本支持的**后台工作进程(background worker process)**中，它可以执行用户实现的功能。这里不详细介绍，请参考[官方文档](http://www.postgresql.org/docs/current/static/bgworker.html)。
 
 在下面的小节中，将详细介绍前三种类型的进程。
 
@@ -32,7 +32,7 @@ PostgreSQL是一个具有多进程体系结构的C/S类型的关系数据库管�
 
 ### 2.1.2. 后端进程(backend process)
 
-后端进程(也称为*postgres*)由postgres服务进程启动，并处理由一个连接的客户端发出的所有查询。它通过单个TCP连接与客户端进行通信，并在客户端断开连接时终止。
+后端进程由postgres服务进程启动，并处理由一个连接的客户端发出的所有查询。它通过单个TCP连接与客户端进行通信，并在客户端断开连接时终止。
 
 由于它只允许操作一个数据库，因此在连接到PostgreSQL服务器时必须明确指定使用的数据库。
 
@@ -102,11 +102,11 @@ PostgreSQL中的内存架构可以分为两大类：
 
 PostgreSQL服务器启动时共享内存区域。这个区域也被分成几个固定大小的子区域。表2.3列出了主要的子区域。细节将在下面的章节中描述。
 
-| 子区域             | 描述                                                         | 参考                                                       |
-| ------------------ | ------------------------------------------------------------ | ---------------------------------------------------------- |
-| shared buffer pool | PostgreSQL将表和索引中的页面从持久存储装载到这里，并直接操作它们 | [Chapter 8](http://www.interdb.jp/pg/pgsql08.html)         |
-| WAL buffer         | 为了确保服务器故障没有数据丢失，PostgreSQL支持WAL机制。WAL数据（也称为XLOG记录）是PostgreSQL中的事务日志; 而WAL缓冲区是在写入永久性存储之前WAL数据的缓冲区 | [Chapter 9](http://www.interdb.jp/pg/pgsql09.html)         |
-| commit log         | 提交日志（CLOG）为并发控制（CC）机制保留所有事务的状态（例如in_progress，committed，aborted） | [Section 5.4](http://www.interdb.jp/pg/pgsql05.html#_5.4.) |
+| 子区域             | 描述                                                         | 参考              |
+| ------------------ | ------------------------------------------------------------ | ----------------- |
+| shared buffer pool | PostgreSQL将表和索引中的页面从持久存储装载到这里，并直接操作它们 | [第8章](ch8.md)   |
+| WAL buffer         | 为了确保服务器故障没有数据丢失，PostgreSQL支持WAL机制。WAL数据(也称为XLOG记录)是PostgreSQL中的事务日志; 而WAL缓冲区是在写入永久性存储之前WAL数据的缓冲区 | [第9章](ch9.mdl)  |
+| commit log         | 提交日志(CLOG)为并发控制(CC)机制保留所有事务的状态(例如in_progress，committed，aborted) | [5.4 节](ch5.md.) |
 
 除此之外，PostgreSQL还分配了几个区域，如下所示：
 

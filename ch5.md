@@ -344,27 +344,27 @@ PostgreSQL在内部将事务快照的文本表示格式定义为"100：100："�
 >
 > 函数 [txid_current_snapshot](http://www.postgresql.org/docs/current/static/functions-info.html#FUNCTIONS-TXID-SNAPSHOT) 查看当前事务的快照。
 >
->```sql
->testdb=# SELECT txid_current_snapshot();
->txid_current_snapshot 
->-----------------------
+> ```sql
+> testdb=# SELECT txid_current_snapshot();
+> txid_current_snapshot 
+> -----------------------
 > 100:104:100,102
->(1 row)
->```
+> (1 row)
+> ```
 >
 > txid_current_snapshot的文本表示形式为“xmin：xmax：xip_list“，这些内容描述如下。
 >
->- xmin
+> **xmin**
 >
-> 		 最早的还在活动的txid。所有之前的事务要么提交且可见，要么回滚而无效。
+> 最早的还在活动的txid。所有之前的事务要么提交且可见，要么回滚而无效。
 >
->- xmax
+> **xmax**
 >
-> 		尚未分配的txid。所有大于或等于此值的txid在快照时间之前尚未启动，因此不可见。
+> 尚未分配的txid。所有大于或等于此值的txid在快照时间之前尚未启动，因此不可见。
 >
->- xip_list
+> **xip_list**
 >
-> 		在快照时间活动的txid。该list只包含xmin和xmax之间的活动txid。
+> 在快照时间活动的txid。该list只包含xmin和xmax之间的活动txid。
 >
 > 例如，在快照100:104:100,102‘ 中，xmin '100'，xmax '104' 和 xip_list '100,102'。
 >
@@ -376,14 +376,14 @@ PostgreSQL在内部将事务快照的文本表示格式定义为"100：100："�
 >
 > 第一个例子是'100'。该快照意味着以下内容(图5.8(a))：
 >
->- 等于或小于99的txids不活动，因为xmin是100。
->- 等于或大于100的txids是活动的，因为xmax是100。
+> - 等于或小于99的txids不活动，因为xmin是100。
+> - 等于或大于100的txids是活动的，因为xmax是100。
 >
 > 第二个例子是'100:104:100,102'。这个快照意味着以下内容(图5.8(b))：
 >
->- 等于或小于99的txids不活动。
->- 等于或大于104的txids处于活动状态。
->- 因为它们存在于xip_list中，所以txids 100和102是活动的，而txids 101和103不活动。
+> - 等于或小于99的txids不活动。
+> - 等于或大于104的txids处于活动状态。
+> - 因为它们存在于xip_list中，所以txids 100和102是活动的，而txids 101和103不活动。
 
 
 
@@ -983,13 +983,13 @@ PostgreSQL的并发控制机制需要以下过程维护。
 
 在PostgreSQL中，VACUUM处理负责这些过程。[第六章](ch6.md)介绍VACUUM处理。
 
-### 5.10.1. FREEZE 处理
+### 5.10.1. 冻结处理
 
 在这里，我们描述 txid wraparound 问题。
 
-假定 txid 100 插入元组 Tuple_1，即 Tuple_1 的 t_xmin 为 100。服务器运行了很长时间，Tuple_1 没有被修改。当前 txid 为21亿+100，并执行 SELECT 命令。此时，Tuple_1 可见，因为 txid 100 是过去。然后，执行相同的SELECT 命令; 此时，目前的 txid 为21亿+101。然而，Tuple_1 不再可见，因为 txid 100 在未来(图5.20)。这是PostgreSQL中所谓的 *transaction wraparound problem*。
+假定 txid 100 插入元组 Tuple_1，即 Tuple_1 的 t_xmin 为 100。服务器运行了很长时间，Tuple_1 没有被修改。当前 txid 为21亿+100，并执行 SELECT 命令。此时，Tuple_1 可见，因为 txid 100 是过去。然后，执行相同的SELECT 命令; 此时，目前的 txid 为21亿+101。然而，Tuple_1 不再可见，因为 txid 100 在未来(图5.20)。这是PostgreSQL中所谓的 *事务环绕问题 transaction wraparound problem*。
 
-**图. 5.20. Wraparound 问题**
+**图. 5.20. 环绕问题**
 
 ![Fig. 5.20. Wraparound problem.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch5/fig-5-20.png?raw=true)
 
@@ -997,13 +997,13 @@ PostgreSQL的并发控制机制需要以下过程维护。
 
 在PostgreSQL中，定义了一个 frozen txid，它是一个特殊的保留 txid 2，它总是比所有其他 txid 更早。换句话说，frozen txid 总是不活动和可见的。
 
-freeze 处理由 vacuum 调用。如果 t_xmin 值早于当前 txid 减去 [vacuum_freeze_min_age](https://www.postgresql.org/docs/current/static/runtime-config-client.html#GUC-VACUUM-FREEZE-MIN-AGE)(缺省值为5000万)，则 freeze 处理将扫描所有表文件并将元组的t_xmin重写为 frozen txid。这在[第六章](http://www.interdb.jp/pg/pgsql06.html)中有更详细的解释。
+冻结处理由 vacuum 调用。如果 t_xmin 值早于当前 txid 减去 [vacuum_freeze_min_age](https://www.postgresql.org/docs/current/static/runtime-config-client.html#GUC-VACUUM-FREEZE-MIN-AGE)(缺省值为5000万)，则 冻结处理将扫描所有表文件并将元组的t_xmin重写为 frozen txid。这在[第六章](http://www.interdb.jp/pg/pgsql06.html)中有更详细的解释。
 
-例如，如图5.21 a)所示，当前txid为5000万，freeze 处理由 VACUUM 调用。在这种情况下，Tuple_1和Tuple_2的t_xmin都被重写为2。
+例如，如图5.21 a)所示，当前txid为5000万，冻结处理由VACUUM调用。在这种情况下，Tuple_1和Tuple_2的t_xmin都被重写为2。
 
 在9.4版本或更高版本中，将XMIN_FROZEN位设置到元组的t_infomask字段，而不是将元组的t_xmin重写为frozen txid(图5.21 b)。
 
-**图. 5.21. Freeze 处理**
+**图. 5.21. 冻结处理**
 
 ![Fig. 5.21. Freeze process.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch5/fig-5-21.png?raw=true)
 

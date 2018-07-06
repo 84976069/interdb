@@ -1,6 +1,6 @@
 ## 第六章 VACUUM{docsify-ignore} 
 
-vacuum处理是一个维护过程，有助于PostgreSQL的持续运行。它的两个主要任务是 *清理 dead tuples* 和 *冻结(freezing)事务ID*，这两个都在[Section 5.10 节](http://www.interdb.jp/pg/pgsql05.html#_5.10.)中简要提及。
+vacuum处理是一个维护过程，有助于PostgreSQL的持续运行。它的两个主要任务是 *清理 dead tuples* 和 *冻结事务ID*，这两个都在[5.10 节](ch5.md)中简要提及。
 
 为了清理 dead tuple，vacuum提供了两种模式，即 **Concurrent VACUUM** 和 **Full VACUUM**。Concurrent VACUUM(通常简称为VACUUM)为表文件的每个页清理 dead tuple，其他事务可以在此过程运行时读取表。相比之下，Full VACUUM 清理 dead tuple 并且整理文件的 live tuple 碎片，而其他事务无法在 Full VACUUM 运行时访问表。
 
@@ -41,7 +41,7 @@ vacuum处理对指定的表或数据库中的所有表执行以下操作
  
 
 > :pushpin: *伪代码: Concurrent VACUUM*
-
+>
 >```sql
 >(1)  FOR each table
 >(2)       Acquire ShareUpdateExclusiveLock lock for the target table
@@ -66,28 +66,28 @@ vacuum处理对指定的表或数据库中的所有表执行以下操作
 >(10)  Update statistics and system catalogs
 >(11)  Remove both unnecessary files and pages of the clog if possible
 >```
-
-> (1)从指定的表中获取每个表。
-
-> (2)获取表的ShareUpdateExclusiveLock锁。该锁允许从其他事务中读取。
-
-> (3)扫描所有页以获取所有dead tuple，并在必要时冻结dead tuple。
-
-> (4)删除指向相应dead tuple的索引元组(如果存在的话)。
-
-> (5)为表的每个页执行以下处理，步骤(6)和(7)。
-
-> (6)删除dead tuple并重新分配页中的live tuple。
-
-> (7)更新目标表的相应FSM和VM。
-
-> (8)如果最后一页没有任何元组，则截断最后一页。
-
-> (9)更新与vacuum处理的表相关的统计数据和系统目录。
-
-> (10)更新与vacuum处理相关的统计数据和系统目录。
-
-> (11)如果可能，删除不必要的文件和clog。
+>
+> (1) 从指定的表中获取每个表。
+>
+> (2) 获取表的ShareUpdateExclusiveLock锁。该锁允许从其他事务中读取。
+>
+> (3) 扫描所有页以获取所有dead tuple，并在必要时冻结dead tuple。
+>
+> (4) 删除指向相应dead tuple的索引元组(如果存在的话)。
+>
+> (5) 为表的每个页执行以下处理，步骤(6)和(7)。
+>
+> (6) 删除dead tuple并重新分配页中的live tuple。
+>
+> (7) 更新目标表的相应FSM和VM。
+>
+> (8) 如果最后一页没有任何元组，则截断最后一页。
+>
+> (9) 更新与vacuum处理的表相关的统计数据和系统目录。
+>
+> (10) 更新与vacuum处理相关的统计数据和系统目录。
+>
+> (11) 如果可能，删除不必要的文件和clog。
 
 
 
