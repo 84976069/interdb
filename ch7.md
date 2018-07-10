@@ -93,33 +93,31 @@ testdb=# UPDATE tbl SET data = 'B' WHERE id = 1000;
 
 请注意，碎片整理的成本低于正常VACUUM处理的成本，因为碎片整理不涉及删除索引元组。
 
-因此，使用HOT可以减少页索引和表的消耗; 这也减少了VACUUM处理必须处理的元组数量。因此，HOT对性能有很好的影响，因为它通过更新和VACUUM处理的必要性最终减少了索引元组的插入次数。
+因此，使用HOT可以减少页索引和表的消耗; 这也减少了VACUUM处理必须处理的元组数量。因此，HOT对性能有很好的帮助，因为它通过更新和vacuum处理的必要性最终减少了索引元组的插入数量。
 
- 
 
 > :pushpin: *HOT 不可用情况*
-
+>
 > 为了清楚地理解HOT如何执行，描述一下HOT不可用的情况。
-
+>
 > 当更新的元组存储在另一个不存储旧元组的页中时，指向元组的索引元组也被插入到索引页中。参考图7.6(a)。
-
+>
 > 当索引元组的key值被更新时，新的索引元组被插入到索引页中。参照图7.6(b)。
-
+>
 > **图. 7.6. HOT不可用的情况**
-
+>
 > ![Fig. 7.6. The Cases in which HOT is not available](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch7/fig-7-06.png?raw=true)
 
- 
 
 > :pushpin: *与HOT相关的统计信息*
-
+>
 > [pg_stat_all_tables](https://www.postgresql.org/docs/current/static/monitoring-stats.html#PG-STAT-ALL-TABLES-VIEW) 视图为每个表提供统计值。另请参阅此[扩展](https://github.com/s-hironobu/pg_stats)。
 
  
 
 ## 7.2. Index-Only Scans
 
-为了减少I/O(输入/输出)成本，index-only scans(通常称为 index-only access)直接使用索引键而不访问相应的表页，当SELECT语句的所有目标条目都包含在 索引键。几乎所有的商业RDBMS都提供这种技术，如DB2和Oracle。PostgreSQL从9.2版本开始引入这个选项。
+为了降低I/O)成本，当SELECT语句的所有目标条目都包含在索引键中时，仅索引扫描直接使用索引键，而无需访问相应的表页。几乎所有的商业RDBMS都提供这种技术，如DB2和Oracle。PostgreSQL从9.2版本开始引入这个选项。
 
 下面用一个具体的例子，描述PostgreSQL中 index-only scans。
 
@@ -170,7 +168,7 @@ testdb=# SELECT id, name FROM tbl WHERE id BETWEEN 18 and 19;
 
 该查询从表的两列中获取数据：'id'和'name'，索引'tbl_idx'由这些列组成。因此，当使用索引扫描时，乍一看似乎不需要访问表页面，因为索引元组包含必要的数据。但事实上，PostgreSQL原则上必须检查元组的可见性，并且索引元组没有关于事务的任何信息，例如5.2节中描述的堆元组的t_xmin和t_xmax。因此，PostgreSQL必须访问表数据来检查索引元组中数据的可见性。这有点本末倒置。
 
-为了避免这种困境，PostgreSQL使用目标表的可见性映射。如果存储在页中的所有元组都可见，则PostgreSQL使用索引元组的键，并且不访问索引元组指向的表页以检查其可见性; 否则，PostgreSQL读取从索引元组指向的表元组并检查元组的可见性，这是普通的过程。
+为了避免这种问题，PostgreSQL使用目标表的可见性映射。如果存储在页中的所有元组都可见，则PostgreSQL使用索引元组的键，并且不访问索引元组指向的表页以检查其可见性; 否则，PostgreSQL读取从索引元组指向的表元组并检查元组的可见性，这是普通的过程。
 
 在这个例子中，不需要访问'Tuple_18'，因为存储'Tuple_18'的第0页是可见的，也就是说，包括第0页中的Tuple_18的所有元组都可见。相反，需要访问'Tuple_19'来处理并发控制，因为第一页的可见性不可见。参考图7.7。
 
