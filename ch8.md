@@ -12,7 +12,7 @@
 
 **图. 8.1. 缓冲区管理器，存储和后端进程之间的关系**
 
-![Fig. 8.1. Relations between buffer manager, storage, and backend processes.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch8/fig-8-01.png?raw=true)
+![Fig. 8.1. Relations between buffer manager, storage, and backend processes.](https://github.com/yonj1e/interdb/blob/master/imgs/ch8/fig-8-01.png?raw=true)
 
 
 
@@ -38,7 +38,7 @@ buffer_tag包含三个值：其page页的relfilenode和fork号及其页面的块
 
 **图. 8.2. 后端如何从缓冲区管理器中读取页面**
 
-![Fig. 8.2. How a backend reads a page from the buffer manager.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch8/fig-8-02.png?raw=true)
+![Fig. 8.2. How a backend reads a page from the buffer manager.](https://github.com/yonj1e/interdb/blob/master/imgs/ch8/fig-8-02.png?raw=true)
 
 (1) 当读取表或索引页时，后端进程向缓冲区管理器发送一个请求，该请求包含页面的buffer_tag。
 
@@ -78,7 +78,7 @@ PostgreSQL缓冲区管理器包含三个层，即缓冲表、缓冲描述符和�
 
 **图. 8.3. 缓冲区管理器的三层结构**
 
-![Fig. 8.3. Buffer manager's three-layer structure.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch8/fig-8-03.png?raw=true)
+![Fig. 8.3. Buffer manager's three-layer structure.](https://github.com/yonj1e/interdb/blob/master/imgs/ch8/fig-8-03.png?raw=true)
 
 - **缓冲池** 是一个数组。每个插槽都存储一个数据文件页面。数组插槽的索引被称为*buffer_id*s。
 - **缓冲描述符** 是一个缓冲区描述符数组。每个描述符与缓冲池槽位具有一对一的对应关系，并将存储的页面的元数据保存在相应的槽中。
@@ -95,7 +95,7 @@ PostgreSQL缓冲区管理器包含三个层，即缓冲表、缓冲描述符和�
 
 **图 8.4. 缓冲表**
 
-![Fig. 8.4. Buffer table.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch8/fig-8-04.png?raw=true)
+![Fig. 8.4. Buffer table.](https://github.com/yonj1e/interdb/blob/master/imgs/ch8/fig-8-04.png?raw=true)
 
 数据条目包含两个值：页面的buffer_tag和保存页面元数据的描述符的buffer_id。例如，数据条目'Tag_A，id = 1'意味着具有buffer_id 1的缓冲区描述符存储标记为Tag_A的页面的元数据。
 
@@ -147,9 +147,9 @@ PostgreSQL缓冲区管理器包含三个层，即缓冲表、缓冲描述符和�
 
 在下面的图中，缓冲区描述符的状态由彩色框表示。
 
-![](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch8/buf-8-01.jpg?raw=true)
+![](https://github.com/yonj1e/interdb/blob/master/imgs/ch8/buf-8-01.jpg?raw=true)
 
-另外，脏页被表示为'X'。例如，一个unpinned缓冲区描述符由![脏描述符由表示](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch8/buf-8-02.jpg?raw=true)表示。
+另外，脏页被表示为'X'。例如，一个unpinned缓冲区描述符由![脏描述符由表示](https://github.com/yonj1e/interdb/blob/master/imgs/ch8/buf-8-02.jpg?raw=true)表示。
 
 ### 8.2.3. 缓冲区描述符层
 
@@ -165,7 +165,7 @@ PostgreSQL缓冲区管理器包含三个层，即缓冲表、缓冲描述符和�
 
 **图. 8.5. 缓冲区管理器初始状态**
 
-![Fig. 8.5. Buffer manager initial state.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch8/fig-8-05.png?raw=true)
+![Fig. 8.5. Buffer manager initial state.](https://github.com/yonj1e/interdb/blob/master/imgs/ch8/fig-8-05.png?raw=true)
 
 图8.6显示了如何加载第一页。
 
@@ -181,7 +181,7 @@ PostgreSQL缓冲区管理器包含三个层，即缓冲表、缓冲描述符和�
 
 **图. 8.6. 加载第一页**
 
-![Fig. 8.6. Loading the first page.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch8/fig-8-06.png?raw=true)
+![Fig. 8.6. Loading the first page.](https://github.com/yonj1e/interdb/blob/master/imgs/ch8/fig-8-06.png?raw=true)
 
  从freelist中检索的描述符总是保存页面的元数据。换句话说，继续使用非空描述符不会返回到freelist。但是，当下列情况之一发生时，相关描述符会再次添加到freelist中，并且描述符状态将变为“empty”：
 
@@ -227,7 +227,7 @@ BufMappingLock被分割成分区以减少缓冲表中的争用(默认是128个�
 
 **图 8.7. 两个进程以独占模式同时获取BufMappingLock的各个分区以插入新的数据条目**
 
-![Fig. 8.7. Two processes simultaneously acquire the respective partitions of BufMappingLock in exclusive mode to insert new data entries.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch8/fig-8-07.png?raw=true)
+![Fig. 8.7. Two processes simultaneously acquire the respective partitions of BufMappingLock in exclusive mode to insert new data entries.](https://github.com/yonj1e/interdb/blob/master/imgs/ch8/fig-8-07.png?raw=true)
 
 缓冲表需要许多其他锁。例如，缓冲表在内部使用自旋锁spinlock来删除条目。但是，这些其他锁的描述被省略，因为它们在本文档中不是必需的。
 
@@ -327,7 +327,7 @@ ReadBufferExtended 函数的行为取决于三个逻辑情况。以下小节将�
 
 **图. 8.8. 访问存储在缓冲池中的页**
 
-![Fig. 8.8. Accessing a page stored in the buffer pool.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch8/fig-8-08.png?raw=true)
+![Fig. 8.8. Accessing a page stored in the buffer pool.](https://github.com/yonj1e/interdb/blob/master/imgs/ch8/fig-8-08.png?raw=true)
 
 然后，当从缓冲池槽位中的页面读取行时，PostgreSQL进程获取相应缓冲区描述符的共享content_lock。因此，缓冲池槽位可以被多个进程同时读取。
 
@@ -361,7 +361,7 @@ ReadBufferExtended 函数的行为取决于三个逻辑情况。以下小节将�
 
 **图. 8.9. 将存储页面加载到空白插槽**
 
-![Fig. 8.9. Loading a page from storage to an empty slot.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch8/fig-8-09.png?raw=true)
+![Fig. 8.9. Loading a page from storage to an empty slot.](https://github.com/yonj1e/interdb/blob/master/imgs/ch8/fig-8-09.png?raw=true)
 
 ### 8.4.3. 将页面从存储加载到victim缓冲池槽
 
@@ -393,7 +393,7 @@ ReadBufferExtended 函数的行为取决于三个逻辑情况。以下小节将�
 
 **图. 8.10. 将存储页面加载到victim缓冲池槽位** 
 
-![Fig. 8.10. Loading a page from storage to a victim buffer pool slot.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch8/fig-8-10.png?raw=true)
+![Fig. 8.10. Loading a page from storage to a victim buffer pool slot.](https://github.com/yonj1e/interdb/blob/master/imgs/ch8/fig-8-10.png?raw=true)
 
 (6) 从缓冲表中删除旧条目，并释放旧的BufMappingLock分区。
 
@@ -405,7 +405,7 @@ ReadBufferExtended 函数的行为取决于三个逻辑情况。以下小节将�
 
 **图. 8.11. 将存储器中的页面加载到victim缓冲池槽位(接下来的图8.10)**
 
-![Fig. 8.11. Loading a page from storage to a victim buffer pool slot (continued from Fig. 8.10).](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch8/fig-8-11.png?raw=true)
+![Fig. 8.11. Loading a page from storage to a victim buffer pool slot (continued from Fig. 8.10).](https://github.com/yonj1e/interdb/blob/master/imgs/ch8/fig-8-11.png?raw=true)
 
 ### 8.4.4. 页面替换算法：Clock Sweep
 
@@ -448,7 +448,7 @@ ReadBufferExtended 函数的行为取决于三个逻辑情况。以下小节将�
 
 **图. 8.12. Clock Sweep.**
 
-![Fig. 8.12. Clock Sweep.](https://github.com/yonj1e/The-Internals-of-PostgreSQL/blob/master/imgs/ch8/fig-8-12.png?raw=true)
+![Fig. 8.12. Clock Sweep.](https://github.com/yonj1e/interdb/blob/master/imgs/ch8/fig-8-12.png?raw=true)
 
 1) nextVictimBuffer指向第一个描述符(buffer_id 1); 然而，这个描述符因为被锁定而被跳过。
 
