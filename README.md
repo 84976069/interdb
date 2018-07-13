@@ -9,7 +9,7 @@
 - 作者： [Hironobu SUZUKI](http://www.interdb.jp/)
 - 原书名称：[《The Internals of PostgreSQL》](http://www.interdb.jp/pg/index.html)
 - 译者：[杨杰](https://yonj1e.github.io/young/) （[yonj1e@163.com](mailto:yonj1e@163.com) ）
-- 译文地址：[PostgreSQL的内部结构](https://yonj1e.github.io/The-Internals-of-PostgreSQL/#/)
+- 译文地址：[PostgreSQL的内部结构](https://yonj1e.github.io/interdb/)
 
 ## 法律声明
 
