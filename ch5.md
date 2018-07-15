@@ -109,7 +109,7 @@ txid可以相互比较。例如，从txid 100的角度看，大于100的txid表�
 
 ![Fig. 5.1. Transaction ids in PostgreSQL.](https://github.com/yonj1e/interdb/blob/master/imgs/ch5/fig-5-01.png?raw=true)
 
-由于txid空间在实际系统中是不够的，PostgreSQL将txid空间视为一个圆。之前的21亿txid是“过去的”，之后的21亿txid是“将来的”(图5.1 b)。
+由于txid空间在实际系统中是不够的，PostgreSQL将txid空间视为一个圆。之前的2亿txid是“过去的”，之后的2亿txid是“将来的”(图5.1 b)。
 
 注意，在5.10.1节中描述所谓的 *txid wraparound 问题*。
 
@@ -987,7 +987,7 @@ PostgreSQL的并发控制机制需要以下过程维护。
 
 在这里，我们描述 txid wraparound 问题。
 
-假定 txid 100 插入元组 Tuple_1，即 Tuple_1 的 t_xmin 为 100。服务器运行了很长时间，Tuple_1 没有被修改。当前 txid 为21亿+100，并执行 SELECT 命令。此时，Tuple_1 可见，因为 txid 100 是过去。然后，执行相同的SELECT 命令; 此时，目前的 txid 为21亿+101。然而，Tuple_1 不再可见，因为 txid 100 在未来(图5.20)。这是PostgreSQL中所谓的 *事务环绕问题 transaction wraparound problem*。
+假定 txid 100 插入元组 Tuple_1，即 Tuple_1 的 t_xmin 为 100。服务器运行了很长时间，Tuple_1 没有被修改。当前 txid 为2亿+100，并执行 SELECT 命令。此时，Tuple_1 可见，因为 txid 100 是过去。然后，执行相同的SELECT 命令; 此时，目前的 txid 为2亿+101。然而，Tuple_1 不再可见，因为 txid 100 在未来(图5.20)。这是PostgreSQL中所谓的 *事务环绕问题 transaction wraparound problem*。
 
 **图. 5.20. 环绕问题**
 
