@@ -661,7 +661,7 @@ testdb=# SELECT * FROM tbl;
 
 
 
-## 5.8. 防止丢失更新 Lost Updates
+## 5.8. 防止丢失更新
 
 
 **丢失更新 Lost Updates**(也称为**ww-conflict**)是当并发事务更新相同行时发生的异常，并且在REPEATABLE READ和SERIALIZABLE级别都必须防止出现这种异常。本节介绍PostgreSQL如何防止丢失更新并给出示例。
@@ -860,7 +860,7 @@ CheckTargetForConflictOut和CheckTargetForConflictIn函数以及在COMMIT命令�
 
 ### 5.9.3. SSI 如何执行 
 
-在这里，我们描述SSI如何解决Write-Skew异常。我们使用如下所示的表tbl：
+在这里，我们描述SSI如何解决写倾斜异常。我们使用如下所示的表tbl：
 
 ```sql
 testdb=# CREATE TABLE tbl (id INT primary key, flag bool DEFAULT false);
@@ -870,7 +870,7 @@ testdb=# ANALYZE tbl;
 
 事务Tx_A和Tx_B执行以下命令(图5.13)。
 
-**图. 5.13. Write-Skew scenario.**
+**图. 5.13. 写倾斜场景**
 
 ![Fig. 5.13. Write-Skew scenario.](https://github.com/yonj1e/interdb/blob/master/imgs/ch5/fig-5-13.png?raw=true)
 
@@ -892,7 +892,7 @@ testdb=# ANALYZE tbl;
 
 **T6**：Tx_B提交; 但是，由于写偏异常而中止。
 
-图5.15显示了PostgreSQL如何检测和解决上述场景中描述的Write-Skew异常。
+图5.15显示了PostgreSQL如何检测和解决上述场景中描述的写倾斜异常。
 
 **图5.15. SIREAD锁和rw-conflicts，以及图5.13中所示场景的时间表**
 
@@ -936,7 +936,7 @@ CheckTargetForConflictsIn创建rw-confict C1，这是Tx_B和Tx_A之间Pkey_1和T
 
 如果在T6执行SELECT命令而不是COMMIT，则Tx_B立即中止，因为Tx_B的SELECT命令调用CheckTargetForConflictsOut检测到序列化异常(图5.16(2))。
 
-**图. 5.16. 其他 Write-Skew 场景**
+**图. 5.16. 其他写倾斜场景**
 
 ![Fig. 5.16. Other Write-Skew scenarios.](https://github.com/yonj1e/interdb/blob/master/imgs/ch5/fig-5-16.png?raw=true)
 
@@ -956,13 +956,13 @@ CheckTargetForConflictsIn创建rw-confict C1，这是Tx_B和Tx_A之间Pkey_1和T
 
 ![Fig. 5.17. Scenario where false-positive serialization anomaly occurs.](https://github.com/yonj1e/interdb/blob/master/imgs/ch5/fig-5-17.png?raw=true)
 
-当使用顺序扫描时，正如SIREAD锁的解释中所述，PostgreSQL创建一个relation级别的SIREAD锁。图5.18(1)展示了PostgreSQL使用顺序扫描时的SIREAD锁和 rw-conflict。在这种情况下，会创建与tbl的SIREAD锁相关的rw-conflict C1和C2，并在优先图中创建一个循环。因此，检测到false-positive Write-Skew异常(即使没有冲突，Tx_A或Tx_B也会中止)。
+当使用顺序扫描时，正如SIREAD锁的解释中所述，PostgreSQL创建一个relation级别的SIREAD锁。图5.18(1)展示了PostgreSQL使用顺序扫描时的SIREAD锁和 rw-conflict。在这种情况下，会创建与tbl的SIREAD锁相关的rw-conflict C1和C2，并在优先图中创建一个循环。因此，检测到false-positive 写倾斜异常(即使没有冲突，Tx_A或Tx_B也会中止)。
 
 **图. 5.18. False-positive 异常 (1) – 使用顺序扫描**
 
 ![Fig. 5.18. False-positive anomaly (1) – Using sequential scan.](https://github.com/yonj1e/interdb/blob/master/imgs/ch5/fig-5-18.png?raw=true)
 
-即使使用索引扫描，如果事务Tx_A和Tx_B都获得相同的索引SIREAD锁，PostgreSQL将检测到 false-positive 异常。图5.19给出了这种情况。假设索引页Pkey_1包含两个索引项，其中一个指向Tuple_1，另一个指向Tuple_2。当Tx_A和Tx_B执行相应的SELECT和UPDATE命令时，Pkey_1被Tx_A和Tx_B读写。在这种情况下，两个与Pkey_1关联的 rw-conflict C1和C2在优先图中创建一个循环; 因此，检测到 false-positive Write-Skew 异常。(如果Tx_A和Tx_B获取不同索引页的SIREAD锁，则不会检测到 false-positive，并且可以提交这两个事务。)
+即使使用索引扫描，如果事务Tx_A和Tx_B都获得相同的索引SIREAD锁，PostgreSQL将检测到 false-positive 异常。图5.19给出了这种情况。假设索引页Pkey_1包含两个索引项，其中一个指向Tuple_1，另一个指向Tuple_2。当Tx_A和Tx_B执行相应的SELECT和UPDATE命令时，Pkey_1被Tx_A和Tx_B读写。在这种情况下，两个与Pkey_1关联的 rw-conflict C1和C2在优先图中创建一个循环; 因此，检测到 false-positive 写倾斜异常。(如果Tx_A和Tx_B获取不同索引页的SIREAD锁，则不会检测到 false-positive，并且可以提交这两个事务。)
 
 **图. 5.19. False-positive 异常 (2) – 索引扫描使用相同的索引页**
 
@@ -979,21 +979,21 @@ PostgreSQL的并发控制机制需要以下过程维护。
 3. 冻结旧txid。
 4. 更新FSM、VM和统计信息。
 
-第5.3.2和5.4.3节分别介绍了第一和第二条。第三条与事务ID txid wraparound 问题有关，在下面的小节中对此进行了简要介绍。
+第5.3.2和5.4.3节分别介绍了第一和第二条。第三条与事务ID回卷问题有关，在下面的小节中对此进行了简要介绍。
 
 在PostgreSQL中，VACUUM处理负责这些过程。[第六章](ch6.md)介绍VACUUM处理。
 
 ### 5.10.1. 冻结处理
 
-在这里，我们描述 txid wraparound 问题。
+在这里，我们描述事务ID回卷问题。
 
-假定 txid 100 插入元组 Tuple_1，即 Tuple_1 的 t_xmin 为 100。服务器运行了很长时间，Tuple_1 没有被修改。当前 txid 为21亿+100，并执行 SELECT 命令。此时，Tuple_1 可见，因为 txid 100 是过去。然后，执行相同的SELECT 命令; 此时，目前的 txid 为21亿+101。然而，Tuple_1 不再可见，因为 txid 100 在未来(图5.20)。这是PostgreSQL中所谓的 *事务环绕问题 transaction wraparound problem*。
+假定 txid 100 插入元组 Tuple_1，即 Tuple_1 的 t_xmin 为 100。服务器运行了很长时间，Tuple_1 没有被修改。当前 txid 为21亿+100，并执行 SELECT 命令。此时，Tuple_1 可见，因为 txid 100 是过去。然后，执行相同的SELECT 命令; 此时，目前的 txid 为21亿+101。然而，Tuple_1 不再可见，因为 txid 100 在未来(图5.20)。这是PostgreSQL中所谓的 *事务回卷问题 transaction wraparound problem*。
 
-**图. 5.20. 环绕问题**
+**图. 5.20. 回卷问题**
 
 ![Fig. 5.20. Wraparound problem.](https://github.com/yonj1e/interdb/blob/master/imgs/ch5/fig-5-20.png?raw=true)
 
-为了解决这个问题，PostgreSQL引入了一个名为 *frozen txid* 的概念，并实现了  *FREEZE* 的过程。
+为了解决这个问题，PostgreSQL引入了一个名为 *frozen txid* 的概念，并实现了  *冻结 FREEZE* 的过程。
 
 在PostgreSQL中，定义了一个 frozen txid，它是一个特殊的保留 txid 2，它总是比所有其他 txid 更早。换句话说，frozen txid 总是不活动和可见的。
 
