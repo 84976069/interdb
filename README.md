@@ -2,7 +2,7 @@
 
 ##### 适用于数据库管理员和系统开发人员
 
-![Copyright Diego Zazzeo](https://github.com/yonj1e/interdb/blob/master/imgs/ch0/puestas-fauna-mecanica-c.png?raw=true)
+![Copyright Diego Zazzeo](https://github.com/84976069/interdb/blob/master/imgs/ch0/puestas-fauna-mecanica-c.png?raw=true)
 
 ------
 
@@ -35,12 +35,6 @@
 - [第九章. 预写式日志 (WAL)](ch9.md) 
 - [第十章. 基础备份和时间点恢复 (PITR)](ch10.md) 
 - [第十一章. 流复制](ch11.md) 
-
-## 翻译计划
-
-工作业余时间翻译学习，无聊一起造作啊~
-
-![wechat](https://github.com/yonj1e/interdb/blob/master/imgs/ch0/me.jpg?raw=true)
 
 ## LICENSE
 
