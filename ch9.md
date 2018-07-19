@@ -31,7 +31,7 @@ WAL机制在版本7.1中首次实现以减少服务器崩溃的影响。它还�
 
 **图. 9.1. 没有WAL的插入操作**
 
-![Fig. 9.1. Insertion operations without WAL.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-01.png?raw=true)
+![Fig. 9.1. Insertion operations without WAL.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-01.png?raw=true)
 
 (1)发出第一条INSERT语句，PostgreSQL将TABLE_A的页面从数据库集群加载到内存中的共享缓冲池中，并将一个元组插入到页面中。此页面不会立即写入数据库集群。(正如第8章所述，修改过的页面通常被称为脏页。)
 
@@ -61,7 +61,7 @@ PostgreSQL将所有修改作为历史数据写入永久存储器，以便为失�
 
 **图. 9.2. 有WAL的插入操作**
 
-![Fig. 9.2. Insertion operations with WAL.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-02.png?raw=true)
+![Fig. 9.2. Insertion operations with WAL.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-02.png?raw=true)
 
 
 
@@ -89,7 +89,7 @@ PostgreSQL将所有修改作为历史数据写入永久存储器，以便为失�
 
 **图 9.3. 使用WAL进行数据库恢复**
 
-![Fig. 9.3. Database recovery using WAL.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-03.png?raw=true)
+![Fig. 9.3. Database recovery using WAL.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-03.png?raw=true)
 
 (1)PostgreSQL从相应的WAL段文件中读取第一条INSERT语句的XLOG记录，将TABLE_A的页面从数据库集群加载到共享缓冲池中。
 
@@ -121,7 +121,7 @@ PostgreSQL支持称为**全页写full-page writes**的功能来处理这类故�
 
 **图. 9.4. 全页写**
 
-![Fig. 9.4. Full page writes.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-04.png?raw=true)
+![Fig. 9.4. Full page writes.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-04.png?raw=true)
 
 (1)checkpointer启动检查点进程。
 
@@ -139,7 +139,7 @@ PostgreSQL支持称为**全页写full-page writes**的功能来处理这类故�
 
 **图. 9.5. 数据库恢复与备份块**
 
-![Fig. 9.5. Database recovery with backup block.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-05.png?raw=true)
+![Fig. 9.5. Database recovery with backup block.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-05.png?raw=true)
 
 (1)PostgreSQL读取第一个INSERT语句的XLOG记录，并将损坏的TABLE_A页面从数据库集群加载到共享缓冲池中。在本例中，XLOG记录是一个备份块，因为根据全页写的写入规则，每个页面的第一个XLOG记录始终是其备份块。
 
@@ -167,7 +167,7 @@ PostgreSQL支持称为**全页写full-page writes**的功能来处理这类故�
 
 **图. 9.6. 事务日志和WAL段文件**
 
-![Fig. 9.6. Transaction log and WAL segment files](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-06.png?raw=true)
+![Fig. 9.6. Transaction log and WAL segment files](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-06.png?raw=true)
 
 WAL段的文件名是十六进制的24位数字，命名规则如下：
 
@@ -208,7 +208,7 @@ WAL段是一个16 MB的文件，它在内部分为8192个字节(8 KB)的页面�
 
 图. 9.7. WAL段文件的内部布局
 
-![Fig. 9.7. Internal layout of a WAL segment file.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-07.png?raw=true)
+![Fig. 9.7. Internal layout of a WAL segment file.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-07.png?raw=true)
 
 XLogLongPageHeaderData结构和XLogPageHeaderData结构在[src/include/access/xlog_internal.h](https://github.com/postgres/postgres/blob/master/src/include/access/xlog_internal.h)中定义。两种结构的解释被省略，因为在以下描述中不需要这些解释。
 
@@ -271,7 +271,7 @@ XLOG记录的数据部分分为备份块(整个页面)或非备份块(通过操�
 
 **图. 9.8. XLOG记录(版本9.4或更早版本)的示例**
 
-![Fig. 9.8. Examples of XLOG records  (version 9.4 or earlier).](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-08.png?raw=true)
+![Fig. 9.8. Examples of XLOG records  (version 9.4 or earlier).](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-08.png?raw=true)
 
 下面介绍XLOG记录的内部结构，给出一些具体示例。
 
@@ -320,7 +320,7 @@ XLOG记录的数据部分可以分为两部分：头和数据。参见图9.9。
 
 **图. 9.9. 常见的XLOG记录格式**
 
-![Fig. 9.9. Common XLOG record format.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-09.png?raw=true)
+![Fig. 9.9. Common XLOG record format.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-09.png?raw=true)
 
 头部分包含零个或多个[XLogRecordBlockHeaders](javascript:void(0)) 和零个或一个 [XLogRecordDataHeaderShort](javascript:void(0)) (或XLogRecordDataHeaderLong); 它必须至少包含其中的一个。当其记录存储备份块时，XLogRecordBlockHeader包含[XLogRecordBlockImageHeader](javascript:void(0))，如果其块被压缩，还包括 [XLogRecordBlockCompressHeader](javascript:void(0))。
 
@@ -338,7 +338,7 @@ XLOG记录的数据部分可以分为两部分：头和数据。参见图9.9。
 
 **图. 9.10. XLOG记录(版本9.5或更高版本)的示例**
 
-![Fig. 9.10. Examples of XLOG records  (version 9.5 or later).](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-10.png?raw=true)
+![Fig. 9.10. Examples of XLOG records  (version 9.5 or later).](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-10.png?raw=true)
 
 一些具体的例子如前一小节所示。
 
@@ -440,7 +440,7 @@ exec_simple_query() @postgres.c
 
 **图. 9.11. XLOG记录的写入顺序**
 
-![Fig. 9.11. Write-sequence of XLOG records.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-11.png?raw=true)
+![Fig. 9.11. Write-sequence of XLOG records.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-11.png?raw=true)
 
 (5)函数XLogWrite()写入并刷新WAL缓冲区上的所有XLOG记录到WAL段文件。
 
@@ -450,7 +450,7 @@ exec_simple_query() @postgres.c
 
 **图. 9.12. XLOG记录的写入顺序(从图9.11继续)**
 
-![Fig. 9.12. Write-sequence of XLOG records (continued from Fig. 9.11).](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-12.png?raw=true)
+![Fig. 9.12. Write-sequence of XLOG records (continued from Fig. 9.11).](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-12.png?raw=true)
 
 在上面的示例中，提交操作导致将XLOG记录写入WAL段，但发生以下任何一种情况时可能会导致写入操作：
 
@@ -494,7 +494,7 @@ WAL writer默认工作，不能被禁用。检查间隔由配置参数wal_writer
 
 **图. 9.13. PostgreSQL检查点的内部处理**
 
-![Fig. 9.13. Internal processing of PostgreSQL's checkpoint.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-13.png?raw=true)
+![Fig. 9.13. Internal processing of PostgreSQL's checkpoint.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-13.png?raw=true)
 
 (1)检查点处理开始后，REDO点存储在内存中; REDO点是在最新检查点开始的时刻写XLOG记录的位置，也是数据库恢复的起点。
 
@@ -553,7 +553,7 @@ PostgreSQL实现基于redo日志的恢复功能。如果数据库服务器崩溃
 
 **图. 9.14. 恢复过程的细节**
 
-![Fig. 9.14. Details of the recovery process.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-14.png?raw=true)
+![Fig. 9.14. Details of the recovery process.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-14.png?raw=true)
 
 (1) PostgreSQL在启动时读取pg_control文件的所有项目。如果状态项目处于 *'in production'* 状态，PostgreSQL将进入恢复模式，因为这意味着数据库没有正常停止;如果 *'shut down'*，它将进入正常启动模式。
 
@@ -565,7 +565,7 @@ PostgreSQL实现基于redo日志的恢复功能。如果数据库服务器崩溃
 
 **图. 9.15. 在background writer工作期间的插入操作**
 
-![Fig. 9.15. Insertion operations during the background writer working.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-15.png?raw=true)
+![Fig. 9.15. Insertion operations during the background writer working.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-15.png?raw=true)
 
 (1) PostgreSQL将一个元组插入到TABLE_A中，并在LSN_1处写入一个XLOG记录。
 
@@ -579,7 +579,7 @@ PostgreSQL实现基于redo日志的恢复功能。如果数据库服务器崩溃
 
 **图. 9.16. 数据库恢复**
 
-![Fig. 9.16. Database recovery.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-16.png?raw=true)
+![Fig. 9.16. Database recovery.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-16.png?raw=true)
 
 (1) PostgreSQL加载第一个XLOG记录和TABLE_A的页面，但不重放它，因为此记录的LSN不大于TABLE_A的LSN(两个值均为LSN_1)。事实上，一眼就可以清楚看到没有必要重放它。
 
@@ -619,13 +619,13 @@ PostgreSQL将XLOG记录写入存储在pg_xlog子目录(版本10或更高版本�
 
 **图. 9.17. 在checkpoint时回收和移除WAL段文件**
 
-![Fig. 9.17. Recycling and removing WAL segment files at a checkpoint.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-17.png?raw=true)
+![Fig. 9.17. Recycling and removing WAL segment files at a checkpoint.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-17.png?raw=true)
 
 如果由于WAL活动中的峰值而需要更多文件，则会在WAL文件的总大小小于max_wal_size时创建新文件。例如，在图9.18中，如果WAL_7已经填满，则WAL_8是新创建的。
 
 **图. 9.18. 创建WAL段文件**
 
-![Fig. 9.18. Creating WAL segment file.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-18.png?raw=true)
+![Fig. 9.18. Creating WAL segment file.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-18.png?raw=true)
 
 WAL文件的数量根据服务器活动自适应地更改。如果WAL数据写入量不断增加，则WAL段文件的估计数量以及WAL文件的总大小也逐渐增加。在相反的情况下(即WAL数据写入的数量减少)，这些减少。
 
@@ -633,7 +633,7 @@ WAL文件的数量根据服务器活动自适应地更改。如果WAL数据写�
 
 **图. 9.19. checkpoint和回收WAL段文件**
 
-![Fig. 9.19. Checkpointing and recycling WAL segment files.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-19.png?raw=true)
+![Fig. 9.19. Checkpointing and recycling WAL segment files.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-19.png?raw=true)
 
 配置参数[wal_keep_segments](http://www.postgresql.org/docs/current/static/runtime-config-replication.html#GUC-WAL-KEEP-SEGMENTS)和[复制槽](http://www.postgresql.org/docs/current/static/warm-standby.html#STREAMING-REPLICATION-SLOTS)功能也会影响WAL段文件的数量。
 
@@ -665,7 +665,7 @@ archive_command = 'cp %p /home/postgres/archives/%f'
 
 **图. 9.20. 连续归档**
 
-![Fig. 9.20. Continuous archiving.](https://github.com/yonj1e/interdb/blob/master/imgs/ch9/fig-9-20.png?raw=true)
+![Fig. 9.20. Continuous archiving.](https://github.com/84976069/interdb/blob/master/imgs/ch9/fig-9-20.png?raw=true)
 
 ------
 
